@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 import {
   Sidebar,
   SidebarContent,
@@ -8,18 +10,25 @@ import {
   SidebarMenuItem,
 } from './ui/sidebar';
 
-import { ChevronUp, User2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, User2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import logo from '@/public/logo.png';
 
 export function AppSidebar() {
   return (
     <Sidebar variant="floating">
-      <SidebarHeader />
+      <SidebarHeader>
+        <SidebarMenu>
+          <div className="lg:hidden flex justify-center w-full">
+            <Image src={logo} alt="logo" className="h-10 w-20 object-cover" />
+          </div>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent />
       <SidebarFooter>
         <SidebarMenu>

@@ -1,5 +1,4 @@
-import Image from 'next/image';
-
+import { Button } from '@/components/ui/button';
 export default function Home() {
-  return <div className="text-muted-foreground">hello world</div>;
+  return <div>hello world</div>;
 }

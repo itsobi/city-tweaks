@@ -3,6 +3,7 @@ import logo from '../../public/logo.png';
 import { HeaderSearch } from './header-search';
 import { Button } from '../ui/button';
 import { SidebarTrigger } from '../ui/sidebar';
+import { CreatePostButton } from '../create-post-button';
 
 export function Header() {
   return (
@@ -21,9 +22,10 @@ export function Header() {
       </div>
 
       <div>
-        <Button variant={'outline'} className="">
+        {/* <Button variant={'outline'} className="">
           Sign In
-        </Button>
+        </Button> */}
+        <CreatePostButton />
       </div>
     </header>
   );
