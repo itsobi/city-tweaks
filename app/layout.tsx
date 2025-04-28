@@ -4,6 +4,9 @@ import './globals.css';
 import { Header } from '@/components/header/header';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/app-sidebar';
+import { ClerkProvider } from '@clerk/nextjs';
+import { ConvexClientProvider } from './convex-client-provider';
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,18 +29,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SidebarProvider>
-          <AppSidebar />
-          <main className="flex-1">
-            <Header />
-            <div className="p-4">{children}</div>
-          </main>
-        </SidebarProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <SidebarProvider>
+            <ConvexClientProvider>
+              <AppSidebar />
+              <main className="flex-1 flex flex-col min-h-screen">
+                <Header />
+                <div className="flex p-4">
+                  <div className="flex flex-1">
+                    <div className="w-full">{children}</div>
+                    <div className="hidden xl:block w-96 sticky top-20 h-[calc(100vh-5rem)]">
+                      <div className="flex justify-center items-center">
+                        right menu
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </main>
+              <Toaster richColors />
+            </ConvexClientProvider>
+          </SidebarProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

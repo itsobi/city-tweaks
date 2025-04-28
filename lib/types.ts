@@ -1,0 +1,20 @@
+import { Id } from '@/convex/_generated/dataModel';
+
+export type UserType = {
+  _id: Id<'users'>;
+  clerkId: string;
+  username: string;
+  imageUrl: string;
+};
+
+export type TweakType = {
+  _id: Id<'tweaks'>;
+  _creationTime: number;
+  imageUrl?: string | null;
+  title: string;
+  authorId: string;
+  isAnonymous: boolean;
+  content: string;
+  city: string;
+  author?: UserType;
+};

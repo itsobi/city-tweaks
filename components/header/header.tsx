@@ -1,31 +1,32 @@
-import Image from 'next/image';
-import logo from '../../public/logo.png';
 import { HeaderSearch } from './header-search';
 import { Button } from '../ui/button';
 import { SidebarTrigger } from '../ui/sidebar';
 import { CreatePostButton } from '../create-post-button';
+import { SignedIn } from '@clerk/nextjs';
+import { SignedOut, SignInButton } from '@clerk/nextjs';
+import { LogIn } from 'lucide-react';
 
 export function Header() {
   return (
-    <header className="flex justify-between items-center border-b border-gray-200 px-4 h-16">
+    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16 overflow-x-hidden">
+      <SidebarTrigger />
+
+      {/* Hidden div for spacing */}
+      <div className="hidden md:block" />
+
+      <HeaderSearch />
+
       <div className="flex items-center gap-2">
-        <SidebarTrigger className="mr-2" />
-        <Image
-          src={logo}
-          alt="logo"
-          className="hidden lg:block mr-2 lg:mr-0 w-[100px]"
-        />
-      </div>
-
-      <div className="max-w-[500px] w-full mr-2 lg:mr-0">
-        <HeaderSearch />
-      </div>
-
-      <div>
-        {/* <Button variant={'outline'} className="">
-          Sign In
-        </Button> */}
-        <CreatePostButton />
+        <SignedOut>
+          <SignInButton mode="modal">
+            <Button variant="outline">
+              <LogIn /> Sign In
+            </Button>
+          </SignInButton>
+        </SignedOut>
+        <SignedIn>
+          <CreatePostButton />
+        </SignedIn>
       </div>
     </header>
   );

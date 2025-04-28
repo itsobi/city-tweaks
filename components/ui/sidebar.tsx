@@ -265,11 +265,11 @@ function SidebarTrigger({
   }
 
   return (
-    <Button
+    <button
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
-      className={className}
+      className={cn(className, 'cursor-pointer')}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
@@ -277,8 +277,7 @@ function SidebarTrigger({
       {...props}
     >
       <span className="text-xl">👉</span>
-      {/* <span className="sr-only">Toggle Sidebar</span> */}
-    </Button>
+    </button>
   );
 }
 

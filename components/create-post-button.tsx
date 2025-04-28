@@ -33,28 +33,32 @@ import {
 import { top25Cities } from '@/lib/top25Cities';
 import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Link from 'next/link';
-import { Camera, Trash } from 'lucide-react';
+import { Camera, SquarePen, Trash } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from './ui/checkbox';
 import { MouseEvent } from 'react';
+import { Input } from './ui/input';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { toast } from 'sonner';
+import { generateUploadUrl } from '@/convex/tweaks';
+import { Id } from '@/convex/_generated/dataModel';
 
 function ImageDropzone({
   onChange,
-  setFilename,
+  setFile,
 }: {
   onChange: (file: File) => void;
-  setFilename: (filename: string | null) => void;
+  setFile: (file: File | null) => void;
 }) {
-  const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const onDrop = useCallback(
     (acceptedFile: File[]) => {
       if (acceptedFile?.[0]) {
         setFile(acceptedFile[0]);
-        setFilename(acceptedFile[0].name);
         const reader = new FileReader();
         reader.onloadend = () => {
           setImagePreview(reader.result as string);
@@ -77,7 +81,6 @@ function ImageDropzone({
     e.stopPropagation();
     setFile(null);
     setImagePreview(null);
-    setFilename(null);
     onChange(undefined as any); // Clear the form value
   };
 
@@ -124,29 +127,91 @@ const formSchema = z.object({
   city: z.string().min(2, {
     message: 'City must be at least 2 characters.',
   }),
+  title: z
+    .string()
+    .min(2, {
+      message: 'Title must be at least 2 characters.',
+    })
+    .max(100, {
+      message: 'Title must be less than 100 characters.',
+    }),
   anonymous: z.boolean(),
-  tweak: z.string().min(2, {
-    message: 'Your city tweak must be at least 2 characters.',
-  }),
-  image: z.instanceof(File).optional(),
+  tweak: z
+    .string()
+    .min(2, {
+      message: 'Your city tweak must be at least 2 characters.',
+    })
+    .max(500, {
+      message: 'Your city tweak must be less than 500 characters.',
+    }),
+  image: z.any().optional(),
 });
 
-function CreatePostForm({ type }: { type: string }) {
-  const [filename, setFilename] = useState<string | null>(null);
+function CreatePostForm({
+  type,
+  setOpen,
+}: {
+  type: string;
+  setOpen: (open: boolean) => void;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       city: '',
+      title: '',
       tweak: '',
       anonymous: false,
       image: undefined,
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const createTweak = useMutation(api.tweaks.createTweak);
+  const generateUploadUrl = useMutation(api.tweaks.generateUploadUrl);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    let imageStorageId: Id<'_storage'> | undefined;
+
+    startTransition(async () => {
+      try {
+        if (file) {
+          const postUrl = await generateUploadUrl();
+
+          const result = await fetch(postUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+
+          console.log('IMAGE POST RESULT', result);
+          const { storageId } = await result.json();
+          imageStorageId = storageId;
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'There was an issue uploading your image.'
+        );
+        return;
+      }
+      const res = await createTweak({
+        isAnonymous: values.anonymous,
+        title: values.title,
+        content: values.tweak,
+        imageStorageId,
+        city: values.city,
+      });
+
+      if (res.success) {
+        toast.success(res.message);
+        setOpen(false);
+      } else {
+        toast.error(res.message);
+      }
+    });
   }
   return (
     <Form {...form}>
@@ -156,7 +221,7 @@ function CreatePostForm({ type }: { type: string }) {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City</FormLabel>
+              <FormLabel>City*</FormLabel>
               <FormControl>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger className="w-full">
@@ -191,6 +256,24 @@ function CreatePostForm({ type }: { type: string }) {
         />
         <FormField
           control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title*</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Title for your tweak"
+                  className="placeholder:text-sm text-sm"
+                />
+              </FormControl>
+              <FormDescription>Title for your city tweak.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="anonymous"
           render={({ field }) => (
             <FormItem>
@@ -218,7 +301,7 @@ function CreatePostForm({ type }: { type: string }) {
           name="tweak"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tweak</FormLabel>
+              <FormLabel>Tweak*</FormLabel>
               <FormControl>
                 <Textarea
                   className="placeholder:text-sm text-sm"
@@ -239,18 +322,14 @@ function CreatePostForm({ type }: { type: string }) {
             control={form.control}
             name="image"
             render={({ field: { onChange, value } }) => {
-              console.log(onChange, value);
               return (
                 <FormItem>
                   <FormLabel>Image</FormLabel>
                   <FormControl>
-                    <ImageDropzone
-                      onChange={onChange}
-                      setFilename={setFilename}
-                    />
+                    <ImageDropzone onChange={onChange} setFile={setFile} />
                   </FormControl>
                   <FormDescription>
-                    {filename && `Selected File: ${filename}`}
+                    {file && `Selected File: ${file.name}`}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -259,8 +338,12 @@ function CreatePostForm({ type }: { type: string }) {
           />
         )}
 
-        <Button type="submit" className="w-full">
-          Submit
+        <Button
+          disabled={!form.formState.isValid || isPending}
+          type="submit"
+          className="w-full"
+        >
+          {isPending ? 'Creating Tweak...' : 'Create Tweak'}
         </Button>
       </form>
     </Form>
@@ -268,11 +351,12 @@ function CreatePostForm({ type }: { type: string }) {
 }
 
 export function CreatePostButton() {
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full" variant={'outline'}>
-          Create Post
+          <SquarePen />
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -289,10 +373,10 @@ export function CreatePostButton() {
             <TabsTrigger value="image">Image</TabsTrigger>
           </TabsList>
           <TabsContent value="post">
-            <CreatePostForm type="post" />
+            <CreatePostForm type="post" setOpen={setOpen} />
           </TabsContent>
           <TabsContent value="image">
-            <CreatePostForm type="image" />
+            <CreatePostForm type="image" setOpen={setOpen} />
           </TabsContent>
         </Tabs>
       </DialogContent>
