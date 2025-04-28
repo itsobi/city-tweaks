@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 
 import {
@@ -11,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from './ui/sidebar';
 
 import {
@@ -29,14 +32,15 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import logo from '@/public/logo.png';
-import { SignedOut, SignInButton, SignOutButton } from '@clerk/nextjs';
+import { SignedOut, SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 import { SignedIn } from '@clerk/nextjs';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { currentUser } from '@clerk/nextjs/server';
 
-export async function AppSidebar() {
-  const user = await currentUser();
+export function AppSidebar() {
+  const { user } = useUser();
+  const { isMobile, toggleSidebar } = useSidebar();
   return (
     <Sidebar variant="sidebar" className="border-r-4 border-yellow-500 shadow">
       <div className="flex justify-center w-full h-10">
@@ -84,7 +88,11 @@ export async function AppSidebar() {
                 >
                   <DropdownMenuItem asChild>
                     <SignOutButton>
-                      <span>
+                      <span
+                        onClick={() => {
+                          if (isMobile) toggleSidebar();
+                        }}
+                      >
                         <LogOut /> Sign Out
                       </span>
                     </SignOutButton>

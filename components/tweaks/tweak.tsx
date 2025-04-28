@@ -7,7 +7,6 @@ import {
   CircleUserRound,
   MessageSquare,
   Reply,
-  Trash2,
 } from 'lucide-react';
 import TimeStamp from './time-stamp';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -19,7 +18,7 @@ import { DeleteButton } from './delete-button';
 
 interface TweakProps {
   tweak: TweakType;
-  userId: string;
+  userId: string | null | undefined;
   isLast: boolean;
 }
 

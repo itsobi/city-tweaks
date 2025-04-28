@@ -13,17 +13,13 @@ export function TweaksWrapper({
   const tweaks = usePreloadedQuery(preloadedTweaks);
   const { user } = useUser();
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <>
       {tweaks.map((tweak, index) => (
         <Tweak
           key={tweak._id}
           tweak={tweak}
-          userId={user.id}
+          userId={user?.id}
           isLast={tweaks.length === index + 1}
         />
       ))}
