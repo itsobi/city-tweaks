@@ -40,7 +40,6 @@ export const createTweak = mutation({
 });
 
 export const getTweaks = query({
-  args: {},
   handler: async (ctx) => {
     const tweaks = await ctx.db.query('tweaks').order('desc').collect();
 
@@ -74,5 +73,40 @@ export const getTweaks = query({
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const deleteTweak = mutation({
+  args: {
+    tweakId: v.id('tweaks'),
+    authorId: v.string(),
+    storageId: v.optional(v.id('_storage')),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) throw new Error('Unauthorized');
+
+    if (identity.subject !== args.authorId) {
+      throw new Error('You are not authorized to delete this tweak.');
+    }
+
+    try {
+      await ctx.db.delete(args.tweakId);
+
+      if (args.storageId) {
+        await ctx.storage.delete(args.storageId);
+      }
+      return { success: true, message: 'City Tweak successfully deleted.' };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'There was a problem deleting your City Tweak.',
+      };
+    }
   },
 });

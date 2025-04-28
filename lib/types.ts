@@ -11,6 +11,7 @@ export type TweakType = {
   _id: Id<'tweaks'>;
   _creationTime: number;
   imageUrl?: string | null;
+  imageStorageId?: Id<'_storage'>;
   title: string;
   authorId: string;
   isAnonymous: boolean;

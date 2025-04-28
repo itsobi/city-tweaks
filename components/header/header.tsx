@@ -8,7 +8,7 @@ import { LogIn } from 'lucide-react';
 
 export function Header() {
   return (
-    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16 overflow-x-hidden">
+    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16 overflow-x-hidden z-50">
       <SidebarTrigger />
 
       {/* Hidden div for spacing */}

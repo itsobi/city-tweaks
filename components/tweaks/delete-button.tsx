@@ -12,10 +12,42 @@ import {
 import { Id } from '@/convex/_generated/dataModel';
 import { Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { toast } from 'sonner';
 
-export function DeleteButton({ tweakId }: { tweakId: Id<'tweaks'> }) {
+interface DeleteButtonProps {
+  tweakId: Id<'tweaks'>;
+  imageStorageId: Id<'_storage'> | undefined;
+  userId: string;
+}
+
+export function DeleteButton({
+  tweakId,
+  imageStorageId,
+  userId,
+}: DeleteButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const deleteTweak = useMutation(api.tweaks.deleteTweak);
+
+  const handleDeleteTweak = () => {
+    startTransition(async () => {
+      const response = await deleteTweak({
+        authorId: userId,
+        tweakId,
+        storageId: imageStorageId,
+      });
+
+      if (response.success) {
+        toast.success(response.message);
+        setIsOpen(false);
+      } else {
+        toast.error(response.message);
+      }
+    });
+  };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -38,7 +70,13 @@ export function DeleteButton({ tweakId }: { tweakId: Id<'tweaks'> }) {
           >
             Cancel
           </Button>
-          <Button variant="destructive">Delete</Button>
+          <Button
+            onClick={handleDeleteTweak}
+            variant="destructive"
+            disabled={isPending}
+          >
+            {isPending ? 'Deleting...' : 'Delete'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

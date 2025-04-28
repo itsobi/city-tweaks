@@ -11,7 +11,6 @@ export function TweaksWrapper({
   preloadedTweaks: Preloaded<typeof api.tweaks.getTweaks>;
 }) {
   const tweaks = usePreloadedQuery(preloadedTweaks);
-  console.log(tweaks);
   const { user } = useUser();
 
   if (!user) {
@@ -20,8 +19,13 @@ export function TweaksWrapper({
 
   return (
     <>
-      {tweaks.map((tweak) => (
-        <Tweak key={tweak._id} tweak={tweak} userId={user.id} />
+      {tweaks.map((tweak, index) => (
+        <Tweak
+          key={tweak._id}
+          tweak={tweak}
+          userId={user.id}
+          isLast={tweaks.length === index + 1}
+        />
       ))}
     </>
   );

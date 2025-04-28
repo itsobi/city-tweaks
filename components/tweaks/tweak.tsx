@@ -1,7 +1,14 @@
 'use client';
 
 import { TweakType } from '@/lib/types';
-import { ArrowDown, ArrowUp, MessageSquare, Reply, Trash2 } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  CircleUserRound,
+  MessageSquare,
+  Reply,
+  Trash2,
+} from 'lucide-react';
 import TimeStamp from './time-stamp';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useMutation, useQuery } from 'convex/react';
@@ -10,7 +17,13 @@ import { useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { DeleteButton } from './delete-button';
 
-export function Tweak({ tweak, userId }: { tweak: TweakType; userId: string }) {
+interface TweakProps {
+  tweak: TweakType;
+  userId: string;
+  isLast: boolean;
+}
+
+export function Tweak({ tweak, userId, isLast }: TweakProps) {
   const votes = useQuery(api.votes.getVotes, {
     tweakId: tweak._id,
   });
@@ -18,7 +31,12 @@ export function Tweak({ tweak, userId }: { tweak: TweakType; userId: string }) {
   const vote = useMutation(api.votes.vote);
 
   return (
-    <div className="flex w-full border-b border-gray-200">
+    <div
+      className={cn(
+        'flex w-full border-b border-gray-200',
+        isLast && 'border-none'
+      )}
+    >
       {/* Upvote/Downvote */}
       <div className="w-6 flex flex-col items-center text-muted-foreground ">
         <button
@@ -67,20 +85,34 @@ export function Tweak({ tweak, userId }: { tweak: TweakType; userId: string }) {
           <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <span>cT/{tweak.city.toLocaleLowerCase()}</span>
             <span>•</span>
-            <div className="flex items-center gap-1">
-              <Avatar className="w-5 h-5 lg:w-6 lg:h-6">
-                <AvatarImage src={tweak.author?.imageUrl} />
-                <AvatarFallback>
-                  {tweak.author?.username?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <span>Post by {tweak.author?.username}</span>
-            </div>
+            {/* Avatar */}
+            {tweak.isAnonymous ? (
+              <div className="flex items-center gap-1">
+                <CircleUserRound className="h-4 w-4 lg:h-5 lg:w-5" />
+                <span>Posted by Anonymous</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <Avatar className="h-5 w-5 lg:h-6 lg:w-6">
+                  <AvatarImage src={tweak.author?.imageUrl} />
+                  <AvatarFallback>
+                    {tweak.author?.username?.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <span>Posted by {tweak.author?.username}</span>
+              </div>
+            )}
             <span>•</span>
             <TimeStamp date={new Date(tweak._creationTime)} />
           </div>
           <div className="flex items-center text-muted-foreground text-xs">
-            {userId === tweak.authorId && <DeleteButton tweakId={tweak._id} />}
+            {userId === tweak.authorId && (
+              <DeleteButton
+                tweakId={tweak._id}
+                imageStorageId={tweak.imageStorageId}
+                userId={userId}
+              />
+            )}
           </div>
         </div>
 
@@ -88,13 +120,15 @@ export function Tweak({ tweak, userId }: { tweak: TweakType; userId: string }) {
         <div className="flex flex-col gap-1">
           <h3 className="text-lg font-medium">{tweak.title}</h3>
 
-          <p className="text-sm lg:text-base text-muted-foreground">
-            {tweak.content}
-          </p>
+          <p className="text-sm lg:text-base">{tweak.content}</p>
           {/* Image */}
           {tweak.imageUrl && (
-            <div>
-              <img src={tweak.imageUrl} alt={tweak.title} />
+            <div className="max-w-2xl">
+              <img
+                src={tweak.imageUrl}
+                alt={tweak.title}
+                className="max-h-[512px] w-full object-contain"
+              />
             </div>
           )}
         </div>
