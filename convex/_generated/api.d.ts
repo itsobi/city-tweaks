@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as comments from "../comments.js";
 import type * as tweaks from "../tweaks.js";
 import type * as votes from "../votes.js";
 
@@ -25,6 +26,7 @@ import type * as votes from "../votes.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  comments: typeof comments;
   tweaks: typeof tweaks;
   votes: typeof votes;
 }>;

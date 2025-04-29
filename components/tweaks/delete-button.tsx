@@ -51,7 +51,10 @@ export function DeleteButton({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="cursor-pointer flex items-center gap-1 hover:text-red-500">
+        <button
+          className="cursor-pointer flex items-center gap-1 hover:text-red-500"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Trash2 className="w-3 h-3" /> Delete
         </button>
       </DialogTrigger>

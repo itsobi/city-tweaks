@@ -16,15 +16,7 @@ import {
   useSidebar,
 } from './ui/sidebar';
 
-import {
-  ChevronDown,
-  ChevronUp,
-  LogIn,
-  LogOut,
-  Plus,
-  SquarePen,
-  User2,
-} from 'lucide-react';
+import { ChevronUp, LogIn, LogOut, SquarePen } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,9 +35,15 @@ export function AppSidebar() {
   const { isMobile, toggleSidebar } = useSidebar();
   return (
     <Sidebar variant="sidebar" className="border-r-4 border-yellow-500 shadow">
-      <div className="flex justify-center w-full h-10">
+      <Link
+        href={'/'}
+        onClick={() => {
+          if (isMobile) toggleSidebar();
+        }}
+        className="flex justify-center w-full h-10"
+      >
         <Image src={logo} alt="logo" className="h-32 w-32 object-contain" />
-      </div>
+      </Link>
       <SidebarGroup className="mt-12">
         <SidebarGroupLabel>Actions</SidebarGroupLabel>
         <SidebarGroupContent>

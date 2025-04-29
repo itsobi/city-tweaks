@@ -2,7 +2,9 @@
 
 - [ ] Reply functionality
 - [ ] Nested reply
-- [ ] AI agent for curse words
+- [ ] Sign Up user webhook
+- [ ] Agent for curse words on post
+- [ ] Agent for for fake cities
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

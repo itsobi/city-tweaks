@@ -44,7 +44,6 @@ import { Input } from './ui/input';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
-import { generateUploadUrl } from '@/convex/tweaks';
 import { Id } from '@/convex/_generated/dataModel';
 
 function ImageDropzone({
@@ -184,7 +183,6 @@ function CreatePostForm({
             body: file,
           });
 
-          console.log('IMAGE POST RESULT', result);
           const { storageId } = await result.json();
           imageStorageId = storageId;
         }
@@ -261,11 +259,7 @@ function CreatePostForm({
             <FormItem>
               <FormLabel>Title*</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Title for your tweak"
-                  className="placeholder:text-sm text-sm"
-                />
+                <Input {...field} placeholder="Title for your tweak" />
               </FormControl>
               <FormDescription>Title for your city tweak.</FormDescription>
               <FormMessage />

@@ -5,6 +5,7 @@ import {
   ArrowDown,
   ArrowUp,
   CircleUserRound,
+  Eye,
   MessageSquare,
   Reply,
 } from 'lucide-react';
@@ -12,13 +13,15 @@ import TimeStamp from './time-stamp';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { DeleteButton } from './delete-button';
+import CreateReplyForm from './create-reply-form';
+import { useRouter } from 'next/navigation';
 
 interface TweakProps {
   tweak: TweakType;
-  userId: string | null | undefined;
+  userId: string | undefined;
   isLast: boolean;
 }
 
@@ -26,6 +29,11 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
   const votes = useQuery(api.votes.getVotes, {
     tweakId: tweak._id,
   });
+  const comments = useQuery(api.comments.getComments, {
+    tweakId: tweak._id,
+  });
+  const [reply, setReply] = useState(false);
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const vote = useMutation(api.votes.vote);
 
@@ -82,12 +90,12 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
         {/* Top Row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground text-xs">
-            <span>cT/{tweak.city.toLocaleLowerCase()}</span>
+            <span>cT/{tweak.city}</span>
             <span>•</span>
             {/* Avatar */}
             {tweak.isAnonymous ? (
               <div className="flex items-center gap-1">
-                <CircleUserRound className="h-4 w-4 lg:h-5 lg:w-5" />
+                <CircleUserRound className="h-5 w-5 lg:h-6 lg:w-6" />
                 <span>Posted by Anonymous</span>
               </div>
             ) : (
@@ -134,13 +142,32 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
 
         {/* Bottom Row */}
         <div className="flex items-center gap-4 text-muted-foreground text-xs">
-          <span className="flex items-center gap-1">
-            <MessageSquare className="w-3 h-3" /> 10 Comments
-          </span>
-          <span className="flex items-center gap-1">
+          <button
+            onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
+            className={cn(
+              'flex items-center gap-1 cursor-pointer',
+              comments?.count && 'hover:text-green-500'
+            )}
+          >
+            <MessageSquare className="w-3 h-3" /> {comments?.count}{' '}
+            {comments && comments.count === 1 ? 'Comment' : 'Comments'}
+          </button>
+          <button
+            onClick={() => setReply(!reply)}
+            className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+          >
             <Reply className="w-3 h-3" /> Reply
-          </span>
+          </button>
+          <button
+            onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
+            className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+          >
+            <Eye className="w-3 h-3" /> View post
+          </button>
         </div>
+
+        {/* Reply Input */}
+        {reply && <CreateReplyForm tweakId={tweak._id} />}
       </div>
     </div>
   );

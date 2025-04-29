@@ -1,3 +1,4 @@
+import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
 
@@ -108,5 +109,73 @@ export const deleteTweak = mutation({
             : 'There was a problem deleting your City Tweak.',
       };
     }
+  },
+});
+
+export const reply = mutation({
+  args: {
+    tweakId: v.id('tweaks'),
+    parentCommentId: v.optional(v.id('comments')),
+    content: v.string(),
+    isParent: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error('Unauthorized');
+    }
+
+    const userId = identity.subject;
+
+    try {
+      await ctx.db.insert('comments', {
+        tweakId: args.tweakId,
+        authorId: userId,
+        content: args.content,
+        parentCommentId: args.parentCommentId,
+        isParent: args.isParent,
+      });
+      return { success: true, message: 'Comment sent successfully!' };
+    } catch (error) {
+      console.log(error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'There was an issue creating your reply',
+      };
+    }
+  },
+});
+
+export const getTweak = query({
+  args: { tweakId: v.id('tweaks') },
+  handler: async (ctx, args) => {
+    const tweak = await ctx.db.get(args.tweakId);
+
+    if (!tweak) {
+      return null;
+    }
+
+    let imageUrl;
+
+    if (tweak.imageStorageId) {
+      imageUrl = await ctx.storage.getUrl(tweak.imageStorageId);
+    }
+
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_clerk_id', (q) => q.eq('clerkId', tweak.authorId))
+      .first();
+
+    const enrichedTweak = {
+      ...tweak,
+      author: user || undefined,
+      imageUrl,
+    };
+
+    return enrichedTweak;
   },
 });
