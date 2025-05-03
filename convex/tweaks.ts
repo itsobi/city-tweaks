@@ -1,3 +1,4 @@
+import { enrichWithUsers } from '@/lib/helpers';
 import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
@@ -44,30 +45,16 @@ export const getTweaks = query({
   handler: async (ctx) => {
     const tweaks = await ctx.db.query('tweaks').order('desc').collect();
 
-    const uniqueClerkIds = [...new Set(tweaks.map((tweak) => tweak.authorId))];
+    const enrichedTweaks = await enrichWithUsers(ctx, tweaks);
 
-    const users = await Promise.all(
-      uniqueClerkIds.map((clerkId) =>
-        ctx.db
-          .query('users')
-          .withIndex('by_clerk_id', (q) => q.eq('clerkId', clerkId))
-          .collect()
-      )
-    ).then((users) => users.flat()); // Flatten the array of arrays
-
-    const userMap = new Map(users.map((user) => [user.clerkId, user]));
-
-    const enrichedTweaks = await Promise.all(
-      tweaks.map(async (tweak) => ({
+    return await Promise.all(
+      enrichedTweaks.map(async (tweak) => ({
         ...tweak,
-        author: userMap.get(tweak.authorId),
         ...(tweak.imageStorageId
           ? { imageUrl: await ctx.storage.getUrl(tweak.imageStorageId) }
           : {}),
       }))
     );
-
-    return enrichedTweaks;
   },
 });
 
@@ -112,7 +99,7 @@ export const deleteTweak = mutation({
   },
 });
 
-export const reply = mutation({
+export const comment = mutation({
   args: {
     tweakId: v.id('tweaks'),
     parentCommentId: v.optional(v.id('comments')),
@@ -124,6 +111,10 @@ export const reply = mutation({
 
     if (!identity) {
       throw new Error('Unauthorized');
+    }
+
+    if (!args.tweakId) {
+      return { success: false, message: 'TweakId not set' };
     }
 
     const userId = identity.subject;

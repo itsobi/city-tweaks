@@ -1,4 +1,3 @@
-import { TweakLoadingSkeleton } from '@/components/tweaks/tweak-loading-skeleton';
 import { TweakWrapper } from '@/components/tweaks/tweak-wrapper';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
@@ -15,6 +14,22 @@ export default async function TweakPage({
   const preloadedTweak = await preloadQuery(api.tweaks.getTweak, {
     tweakId,
   });
+  const preloadedComments = await preloadQuery(api.comments.getComments, {
+    tweakId,
+  });
+  const preloadedNumberOfComments = await preloadQuery(
+    api.comments.getCommentsLength,
+    {
+      tweakId,
+    }
+  );
 
-  return <TweakWrapper preloadedTweak={preloadedTweak} userId={userId} />;
+  return (
+    <TweakWrapper
+      preloadedTweak={preloadedTweak}
+      userId={userId}
+      preloadedComments={preloadedComments}
+      preloadedNumberOfComments={preloadedNumberOfComments}
+    />
+  );
 }

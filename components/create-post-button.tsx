@@ -170,6 +170,11 @@ function CreatePostForm({
   const generateUploadUrl = useMutation(api.tweaks.generateUploadUrl);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const parsed = formSchema.safeParse(values);
+    if (!parsed.success) {
+      toast.error('Invalid form data');
+      return;
+    }
     let imageStorageId: Id<'_storage'> | undefined;
 
     startTransition(async () => {

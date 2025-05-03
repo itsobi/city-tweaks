@@ -4,6 +4,7 @@ import { TweakType } from '@/lib/types';
 import {
   ArrowDown,
   ArrowUp,
+  ChevronUp,
   CircleUserRound,
   Eye,
   MessageSquare,
@@ -15,9 +16,9 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useState, useTransition } from 'react';
 import { cn } from '@/lib/utils';
-import { DeleteButton } from './delete-button';
-import CreateReplyForm from './create-reply-form';
-import { useRouter } from 'next/navigation';
+import { DeleteTweakButton } from './delete-tweak-button';
+import { CreateReplyForm } from './create-reply-form';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface TweakProps {
   tweak: TweakType;
@@ -32,10 +33,18 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
   const comments = useQuery(api.comments.getComments, {
     tweakId: tweak._id,
   });
+  const numberOfComments = useQuery(api.comments.getCommentsLength, {
+    tweakId: tweak._id,
+  });
   const [reply, setReply] = useState(false);
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  const router = useRouter();
+  const pathname = usePathname();
+
   const vote = useMutation(api.votes.vote);
+
+  const isOnTweakPage = pathname.startsWith('/cT/');
 
   return (
     <div
@@ -45,7 +54,7 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
       )}
     >
       {/* Upvote/Downvote */}
-      <div className="w-6 flex flex-col items-center text-muted-foreground ">
+      <div className="w-6 flex flex-col items-center text-muted-foreground gap-0.5 py-1">
         <button
           onClick={() => {
             startTransition(async () => {
@@ -57,12 +66,12 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
           }}
           disabled={isPending}
           className={cn(
-            'cursor-pointer hover:text-green-500',
+            'flex justify-center cursor-pointer hover:text-green-500',
             votes?.[0]?.votes.some((vote) => vote.voteType === 'up') &&
-              'text-green-500'
+              'bg-green-500 rounded-full hover:bg-green-500/50 text-white'
           )}
         >
-          <ArrowUp />
+          <ArrowUp size={20} />
         </button>
         <span className="text-xs">{votes?.[0]?.votes.length ?? 0}</span>
         <button
@@ -78,10 +87,10 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
           className={cn(
             'cursor-pointer hover:text-red-500',
             votes?.[0]?.votes.some((vote) => vote.voteType === 'down') &&
-              'text-red-500'
+              'bg-red-500 rounded-full hover:bg-red-500/50 text-white'
           )}
         >
-          <ArrowDown />
+          <ArrowDown size={20} />
         </button>
       </div>
 
@@ -90,13 +99,16 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
         {/* Top Row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-muted-foreground text-xs">
-            <span>cT/{tweak.city}</span>
+            <span className="text-black">cT/{tweak.city}</span>
             <span>•</span>
             {/* Avatar */}
             {tweak.isAnonymous ? (
               <div className="flex items-center gap-1">
                 <CircleUserRound className="h-5 w-5 lg:h-6 lg:w-6" />
-                <span>Posted by Anonymous</span>
+                <span>
+                  Posted by{' '}
+                  <span className="lg:text-sm text-black">Anonymous</span>
+                </span>
               </div>
             ) : (
               <div className="flex items-center gap-1">
@@ -106,21 +118,25 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
                     {tweak.author?.username?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <span>Posted by {tweak.author?.username}</span>
+                <span>
+                  Posted by{' '}
+                  <span className="lg:text-sm text-black">
+                    {tweak.author?.username}
+                  </span>
+                </span>
               </div>
             )}
             <span>•</span>
             <TimeStamp date={new Date(tweak._creationTime)} />
           </div>
-          <div className="flex items-center text-muted-foreground text-xs">
-            {userId === tweak.authorId && (
-              <DeleteButton
-                tweakId={tweak._id}
-                imageStorageId={tweak.imageStorageId}
-                userId={userId}
-              />
-            )}
-          </div>
+
+          {userId === tweak.authorId && (
+            <DeleteTweakButton
+              tweakId={tweak._id}
+              imageStorageId={tweak.imageStorageId}
+              userId={userId}
+            />
+          )}
         </div>
 
         {/* Post Content */}
@@ -142,32 +158,50 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
 
         {/* Bottom Row */}
         <div className="flex items-center gap-4 text-muted-foreground text-xs">
-          <button
-            onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
-            className={cn(
-              'flex items-center gap-1 cursor-pointer',
-              comments?.count && 'hover:text-green-500'
-            )}
-          >
-            <MessageSquare className="w-3 h-3" /> {comments?.count}{' '}
-            {comments && comments.count === 1 ? 'Comment' : 'Comments'}
-          </button>
-          <button
-            onClick={() => setReply(!reply)}
-            className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
-          >
-            <Reply className="w-3 h-3" /> Reply
-          </button>
-          <button
-            onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
-            className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
-          >
-            <Eye className="w-3 h-3" /> View post
-          </button>
+          {!isOnTweakPage && (
+            <button
+              onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
+              className="flex items-center gap-1 cursor-pointer hover:text-green-500"
+            >
+              <MessageSquare className="w-3 h-3" /> {numberOfComments ?? 0}{' '}
+              {numberOfComments && numberOfComments === 1
+                ? 'Comment'
+                : 'Comments'}
+            </button>
+          )}
+          {reply ? (
+            <button
+              onClick={() => setReply(!reply)}
+              className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+            >
+              <ChevronUp className="w-3 h-3" /> Close
+            </button>
+          ) : (
+            <button
+              onClick={() => setReply(!reply)}
+              className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+            >
+              <Reply className="w-3 h-3" /> Reply
+            </button>
+          )}
+          {!isOnTweakPage && (
+            <button
+              onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
+              className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+            >
+              <Eye className="w-3 h-3" /> View post
+            </button>
+          )}
         </div>
 
         {/* Reply Input */}
-        {reply && <CreateReplyForm tweakId={tweak._id} />}
+        {reply && (
+          <CreateReplyForm
+            tweakId={tweak._id}
+            reply={false}
+            setReply={setReply}
+          />
+        )}
       </div>
     </div>
   );

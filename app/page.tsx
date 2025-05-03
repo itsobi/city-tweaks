@@ -4,9 +4,5 @@ import { preloadQuery } from 'convex/nextjs';
 
 export default async function Home() {
   const preloadedTweaks = await preloadQuery(api.tweaks.getTweaks);
-  return (
-    <div>
-      <TweaksWrapper preloadedTweaks={preloadedTweaks} />
-    </div>
-  );
+  return <TweaksWrapper preloadedTweaks={preloadedTweaks} />;
 }

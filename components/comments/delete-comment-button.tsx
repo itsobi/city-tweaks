@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Dialog,
   DialogContent,
@@ -9,50 +7,49 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Id } from '@/convex/_generated/dataModel';
 import { Trash2 } from 'lucide-react';
-import { Button } from '../ui/button';
 import { useState, useTransition } from 'react';
+import { Button } from '../ui/button';
+import { Id } from '@/convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 
-interface DeleteButtonProps {
-  tweakId: Id<'tweaks'>;
-  imageStorageId: Id<'_storage'> | undefined;
-  userId: string;
+interface DeleteCommentButtonProps {
+  commentId: Id<'comments'>;
+  authorId: string;
 }
 
-export function DeleteButton({
-  tweakId,
-  imageStorageId,
-  userId,
-}: DeleteButtonProps) {
+export function DeleteCommentButton({
+  commentId,
+  authorId,
+}: DeleteCommentButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const deleteTweak = useMutation(api.tweaks.deleteTweak);
 
-  const handleDeleteTweak = () => {
+  const deleteComment = useMutation(api.comments.deleteComment);
+
+  const handleDeleteComment = async () => {
     startTransition(async () => {
-      const response = await deleteTweak({
-        authorId: userId,
-        tweakId,
-        storageId: imageStorageId,
+      const result = await deleteComment({
+        commentId,
+        authorId,
       });
 
-      if (response.success) {
-        toast.success(response.message);
-        setIsOpen(false);
+      if (result.success) {
+        toast.success(result.message);
       } else {
-        toast.error(response.message);
+        toast.error(result.message);
       }
+      setIsOpen(false);
     });
   };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <button
-          className="cursor-pointer flex items-center gap-1 hover:text-red-500"
+          className="cursor-pointer flex items-center text-muted-foreground text-xs gap-1 hover:text-red-500"
           onClick={(e) => e.stopPropagation()}
         >
           <Trash2 className="w-3 h-3" /> Delete
@@ -74,7 +71,7 @@ export function DeleteButton({
             Cancel
           </Button>
           <Button
-            onClick={handleDeleteTweak}
+            onClick={handleDeleteComment}
             variant="destructive"
             disabled={isPending}
           >

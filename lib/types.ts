@@ -20,15 +20,13 @@ export type TweakType = {
   author?: UserType;
 };
 
-export type CommentType = {
-  comments: {
-    _id: Id<'comments'>;
-    _creationTime: number;
-    parentCommentId?: Id<'comments'> | undefined;
-    authorId: string;
-    content: string;
-    tweakId: Id<'tweaks'>;
-    isParent: boolean;
-  }[];
-  count: number;
+export type Comment = {
+  _id: Id<'comments'>;
+  author: UserType | undefined;
+  _creationTime: number;
+  parentCommentId?: Id<'comments'> | undefined;
+  authorId: string;
+  content: string;
+  tweakId?: Id<'tweaks'>;
+  isParent: boolean;
 };
