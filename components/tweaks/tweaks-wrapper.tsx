@@ -14,7 +14,7 @@ export function TweaksWrapper({
   const { user } = useUser();
 
   return (
-    <div>
+    <>
       {tweaks.map((tweak, index) => (
         <Tweak
           key={tweak._id}
@@ -23,6 +23,6 @@ export function TweaksWrapper({
           isLast={tweaks.length === index + 1}
         />
       ))}
-    </div>
+    </>
   );
 }

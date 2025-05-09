@@ -45,6 +45,7 @@ import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 import { Id } from '@/convex/_generated/dataModel';
+import { SidebarMenuButton } from './ui/sidebar';
 
 function ImageDropzone({
   onChange,
@@ -249,7 +250,13 @@ function CreatePostForm({
               <FormDescription>
                 Select the city you want to tweak. If you do not see your city,
                 no worries!{' '}
-                <Link href="/cities" className="text-blue-500 hover:underline">
+                <Link
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  href="/add-city"
+                  className="text-blue-500 hover:underline"
+                >
                   Add your city
                 </Link>
               </FormDescription>
@@ -349,14 +356,21 @@ function CreatePostForm({
   );
 }
 
-export function CreatePostButton() {
+export function CreateCityTweakButton({ sidebar }: { sidebar?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full" variant={'outline'}>
-          <SquarePen />
-        </Button>
+        {sidebar ? (
+          <SidebarMenuButton>
+            <SquarePen />
+            Create City Tweak
+          </SidebarMenuButton>
+        ) : (
+          <Button className="w-full" variant={'outline'}>
+            <SquarePen />
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

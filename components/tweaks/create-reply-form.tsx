@@ -52,8 +52,6 @@ export function CreateReplyForm({
   function onSubmit(values: z.infer<typeof formSchema>) {
     const parsed = formSchema.safeParse(values);
 
-    console.log('tweakID>>>', tweakId);
-
     if (!parsed.success) {
       toast.error('Invalid form data');
       return;
@@ -65,7 +63,6 @@ export function CreateReplyForm({
     }
 
     if (reply && commentId && tweakId) {
-      // console.log('PARENT COMMENT ID>>>', commentId);
       replyStartTransition(async () => {
         const result = await sendReply({
           content: values.reply,

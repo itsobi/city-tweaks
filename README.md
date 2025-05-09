@@ -1,10 +1,15 @@
 ## TODO
 
-- [ ] Reply functionality
-- [ ] Nested reply
-- [ ] Sign Up user webhook
-- [ ] Agent for curse words on post
-- [ ] Agent for for fake cities
+- Create action that will check if the city is fake.
+
+  1. Create mutation that has access to ratelimiting first. If the user has exceeded the limit, return a message that they have exceeded the limit.
+  2. Create server actions using AI to check if the city is fake.
+  3. If the city is fake, return a message that the city is fake.
+  4. If the city is not real, create city in the cities table.
+
+- Agent for for fake cities
+
+- Agent for curse words on post
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

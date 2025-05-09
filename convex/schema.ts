@@ -33,4 +33,10 @@ export default defineSchema({
       })
     ),
   }).index('by_tweak_id', ['tweakId']),
+  cities: defineTable({
+    city: v.string(),
+    state: v.string(),
+    value: v.string(),
+    flag: v.string(),
+  }),
 });

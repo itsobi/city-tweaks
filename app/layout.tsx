@@ -39,11 +39,11 @@ export default function RootLayout({
               <AppSidebar />
               <main className="flex-1 flex flex-col min-h-screen">
                 <Header />
-                <div className="flex p-4">
+                <div className="flex">
                   <div className="flex flex-1">
                     <div className="w-full">{children}</div>
                     <div className="hidden xl:block w-96 sticky top-20 h-[calc(100vh-5rem)]">
-                      <div className="flex justify-center items-center">
+                      <div className="flex justify-center items-center p-4">
                         right menu
                       </div>
                     </div>

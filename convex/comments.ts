@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { enrichWithUsers } from '@/lib/helpers';
+import { api } from './_generated/api';
 
 export const getComments = query({
   args: {
@@ -60,6 +61,17 @@ export const reply = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error('Not authorized');
+
+    const userExists = await ctx.runQuery(api.users.userExists, {
+      clerkId: identity.subject,
+    });
+
+    if (!userExists) {
+      return {
+        success: false,
+        message: 'Your account is not registered properly.',
+      };
+    }
 
     if (!args.parentCommentId) {
       return { success: false, message: 'Parent comment ID not set' };

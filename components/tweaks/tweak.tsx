@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { DeleteTweakButton } from './delete-tweak-button';
 import { CreateReplyForm } from './create-reply-form';
 import { usePathname, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface TweakProps {
   tweak: TweakType;
@@ -44,25 +45,32 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
 
   const vote = useMutation(api.votes.vote);
 
+  const handleVote = (voteType: 'up' | 'down') => {
+    startTransition(async () => {
+      const result = await vote({
+        tweakId: tweak._id,
+        voteType,
+      });
+      if (!result?.success) {
+        toast.error(result?.message ?? 'An error occurred');
+      }
+    });
+  };
+
   const isOnTweakPage = pathname.startsWith('/cT/');
 
   return (
     <div
       className={cn(
-        'flex w-full border-b border-gray-200',
-        isLast && 'border-none'
+        'flex w-full border-b border-r border-gray-200 p-4',
+        isLast && 'border-b-0'
       )}
     >
       {/* Upvote/Downvote */}
-      <div className="w-6 flex flex-col items-center text-muted-foreground gap-0.5 py-1">
+      <div className="w-6 flex flex-col items-center text-muted-foreground gap-0.5 py-1 disabled:cursor-not-allowed">
         <button
           onClick={() => {
-            startTransition(async () => {
-              vote({
-                tweakId: tweak._id,
-                voteType: 'up',
-              });
-            });
+            handleVote('up');
           }}
           disabled={isPending}
           className={cn(
@@ -76,12 +84,7 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
         <span className="text-xs">{votes?.[0]?.votes.length ?? 0}</span>
         <button
           onClick={() => {
-            startTransition(async () => {
-              vote({
-                tweakId: tweak._id,
-                voteType: 'down',
-              });
-            });
+            handleVote('down');
           }}
           disabled={isPending}
           className={cn(

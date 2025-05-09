@@ -9,14 +9,13 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from './ui/sidebar';
 
-import { ChevronUp, LogIn, LogOut, SquarePen } from 'lucide-react';
+import { ChevronUp, LogIn, LogOut, SquarePlus, User } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,17 +23,31 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import logo from '@/public/logo.png';
-import { SignedOut, SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
+import {
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  UserButton,
+  useUser,
+} from '@clerk/nextjs';
 import { SignedIn } from '@clerk/nextjs';
 import { Button } from './ui/button';
 import Link from 'next/link';
-import { currentUser } from '@clerk/nextjs/server';
+import { CreateCityTweakButton } from './create-city-tweak-button';
+import { usePathname } from 'next/navigation';
 
 export function AppSidebar() {
   const { user } = useUser();
   const { isMobile, toggleSidebar } = useSidebar();
+  const pathname = usePathname();
+
+  const isManageAccountPage = pathname === '/manage-account';
+
   return (
-    <Sidebar variant="sidebar" className="border-r-4 border-yellow-500 shadow">
+    <Sidebar
+      variant="sidebar"
+      className="border-r-4 border-yellow-500 shadow z-50"
+    >
       <Link
         href={'/'}
         onClick={() => {
@@ -50,9 +63,17 @@ export function AppSidebar() {
           <SidebarMenu>
             <SignedIn>
               <SidebarMenuItem>
+                <CreateCityTweakButton sidebar={true} />
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link href="/cities">
-                    <SquarePen />
+                  <Link
+                    onClick={() => {
+                      if (isMobile) toggleSidebar();
+                    }}
+                    href="/add-city"
+                  >
+                    <SquarePlus />
                     Add City
                   </Link>
                 </SidebarMenuButton>
@@ -84,6 +105,17 @@ export function AppSidebar() {
                   side="top"
                   className="w-[--radix-popper-anchor-width]"
                 >
+                  <DropdownMenuItem asChild>
+                    <Link
+                      href="/manage-account"
+                      onClick={() => {
+                        if (isMobile) toggleSidebar();
+                      }}
+                    >
+                      <User />
+                      Manage Account
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <SignOutButton>
                       <span

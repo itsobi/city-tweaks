@@ -1,7 +1,7 @@
 import { enrichWithUsers } from '@/lib/helpers';
-import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
 import { v } from 'convex/values';
+import { api } from './_generated/api';
 
 export const createTweak = mutation({
   args: {
@@ -15,6 +15,17 @@ export const createTweak = mutation({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error('Unauthorized');
+    }
+
+    const userExists = await ctx.runQuery(api.users.userExists, {
+      clerkId: identity.subject,
+    });
+
+    if (!userExists) {
+      return {
+        success: false,
+        message: 'Your account is not registered properly.',
+      };
     }
 
     try {
@@ -45,7 +56,26 @@ export const getTweaks = query({
   handler: async (ctx) => {
     const tweaks = await ctx.db.query('tweaks').order('desc').collect();
 
-    const enrichedTweaks = await enrichWithUsers(ctx, tweaks);
+    const votes = await ctx.db.query('votes').collect();
+
+    // Create a map of vote counts for each tweak
+    const voteCountMap = new Map();
+    votes.forEach((voteDoc) => {
+      const upvotes = voteDoc.votes.filter((v) => v.voteType === 'up').length;
+      const downvotes = voteDoc.votes.filter(
+        (v) => v.voteType === 'down'
+      ).length;
+      voteCountMap.set(voteDoc.tweakId, upvotes - downvotes);
+    });
+
+    // Sort tweaks by vote count
+    const sortedTweaks = tweaks.sort((a, b) => {
+      const aVotes = voteCountMap.get(a._id) || 0;
+      const bVotes = voteCountMap.get(b._id) || 0;
+      return bVotes - aVotes; // Sort in descending order
+    });
+
+    const enrichedTweaks = await enrichWithUsers(ctx, sortedTweaks);
 
     return await Promise.all(
       enrichedTweaks.map(async (tweak) => ({
@@ -80,7 +110,15 @@ export const deleteTweak = mutation({
     }
 
     try {
-      await ctx.db.delete(args.tweakId);
+      // delete comments associated with that tweak.
+      const commentsToDelete = await ctx.db
+        .query('comments')
+        .withIndex('by_tweak_id', (q) => q.eq('tweakId', args.tweakId))
+        .collect();
+
+      for (const comment of commentsToDelete) {
+        await ctx.db.delete(args.tweakId);
+      }
 
       if (args.storageId) {
         await ctx.storage.delete(args.storageId);
@@ -115,6 +153,17 @@ export const comment = mutation({
 
     if (!args.tweakId) {
       return { success: false, message: 'TweakId not set' };
+    }
+
+    const userExists = await ctx.runQuery(api.users.userExists, {
+      clerkId: identity.subject,
+    });
+
+    if (!userExists) {
+      return {
+        success: false,
+        message: 'Your account is not registered properly.',
+      };
     }
 
     const userId = identity.subject;
