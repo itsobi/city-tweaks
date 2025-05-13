@@ -15,6 +15,18 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '../ui/input';
+import { checkCity } from '@/lib/actions';
+import { useState, useTransition } from 'react';
+import { toast } from 'sonner';
+import { VerifyCityAlert } from '../verify-city-alert';
+import {
+  Preloaded,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
   city: z
@@ -25,7 +37,7 @@ const formSchema = z.object({
     .max(100, {
       message: 'City must be less than 100 characters.',
     }),
-  state: z
+  region: z
     .string()
     .min(2, {
       message: 'Title must be at least 2 characters.',
@@ -35,18 +47,94 @@ const formSchema = z.object({
     }),
 });
 
-export function AddCityForm() {
+export function AddCityForm({
+  userId,
+  preloadedUserRequest,
+}: {
+  userId: string;
+  preloadedUserRequest: Preloaded<typeof api.requests.userRequest>;
+}) {
+  const [verifiedCity, setVerifiedCity] = useState<{
+    city: string;
+    region: string;
+    flag: string;
+  } | null>(null);
+  const userRequest = usePreloadedQuery(preloadedUserRequest);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       city: '',
-      state: '',
+      region: '',
     },
   });
+  const [isPending, startTransition] = useTransition();
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const updateUserRequest = useMutation(api.requests.updateUserRequest);
+  const addCity = useMutation(api.cities.addCity);
+
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
+
+    startTransition(async () => {
+      // Verify city
+      const checkCityResponse = await checkCity(values);
+
+      if (!checkCityResponse.success) {
+        toast.error(checkCityResponse.error);
+        return;
+      }
+
+      // manual rate limit mutation. User can only add 1 city every 12 hours
+      const userRequestResponse = await updateUserRequest({
+        userTimezone: userTimezone,
+      });
+
+      if (!userRequestResponse.success) {
+        toast.error(userRequestResponse.message);
+        return;
+      }
+
+      if (checkCityResponse.success && checkCityResponse.data.isValid) {
+        setVerifiedCity({
+          city: checkCityResponse.data.city,
+          region: checkCityResponse.data.region,
+          flag: checkCityResponse.data.flag,
+        });
+      } else {
+        console.log('ERROR>>>', checkCityResponse);
+        toast.error(checkCityResponse.error);
+      }
+    });
   };
+
+  if (verifiedCity?.city && verifiedCity?.region) {
+    return (
+      <VerifyCityAlert
+        city={verifiedCity.city}
+        region={verifiedCity.region}
+        onConfirm={async () => {
+          const addCityResponse = await addCity({
+            city: verifiedCity.city,
+            region: verifiedCity.region,
+            flag: verifiedCity.flag,
+          });
+
+          if (addCityResponse.success) {
+            toast.success(addCityResponse.message);
+            form.reset();
+            setVerifiedCity(null);
+            return;
+          } else {
+            setVerifiedCity(null);
+            toast.error(addCityResponse.message);
+          }
+        }}
+        setVerifiedCity={setVerifiedCity}
+      />
+    );
+  }
 
   return (
     <Form {...form}>
@@ -59,7 +147,7 @@ export function AddCityForm() {
           name="city"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>City</FormLabel>
+              <FormLabel>City*</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="Enter city name" />
               </FormControl>
@@ -72,10 +160,10 @@ export function AddCityForm() {
         />
         <FormField
           control={form.control}
-          name="state"
+          name="region"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>State/Province/Region</FormLabel>
+              <FormLabel>State/Province/Region*</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="Enter state/province/region" />
               </FormControl>
@@ -86,9 +174,30 @@ export function AddCityForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Add City
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={!form.formState.isValid || isPending}
+        >
+          {isPending ? 'Verifying...' : 'Add City'}
         </Button>
+        <div>
+          <span className="flex justify-center text-sm  text-muted-foreground italic">
+            User submissions are limited to 2 per day.
+          </span>
+          <span
+            className={cn(
+              'flex justify-center text-sm text-muted-foreground italic',
+              userRequest?.requestCount && userRequest?.requestCount >= 2
+                ? 'text-red-500'
+                : userRequest?.requestCount && userRequest?.requestCount === 1
+                  ? 'text-yellow-500'
+                  : 'text-green-500'
+            )}
+          >
+            {2 - (userRequest?.requestCount ?? 0)} submissions remaining.
+          </span>
+        </div>
       </form>
     </Form>
   );

@@ -7,6 +7,6 @@ export function HeaderSearch() {
   const [searchTerm, setSearchTerm] = useState('');
   return (
     // Use React Select for the search input
-    <Input placeholder="Search for City Tweak" className="max-w-[500px]" />
+    <Input placeholder="Search for City Tweak" className="w-full" />
   );
 }

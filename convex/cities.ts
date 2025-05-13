@@ -1,0 +1,73 @@
+import { v } from 'convex/values';
+import { mutation, query } from './_generated/server';
+
+export const cityExists = query({
+  args: {
+    city: v.string(),
+    region: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const city = await ctx.db
+      .query('cities')
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('city'), args.city),
+          q.eq(q.field('region'), args.region)
+        )
+      )
+      .first();
+
+    if (city) {
+      return true;
+    }
+
+    return false;
+  },
+});
+
+export const addCity = mutation({
+  args: {
+    city: v.string(),
+    region: v.string(),
+    flag: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const cityValue = `${args.city.toLowerCase()}-new`;
+    try {
+      await ctx.db.insert('cities', {
+        city: args.city,
+        region: args.region,
+        value: cityValue,
+        flag: args.flag,
+      });
+      return {
+        success: true,
+        message: 'City added successfully'!,
+      };
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Sorry, there was an issue adding this city',
+      };
+    }
+  },
+});
+
+export const getCities = query({
+  args: {},
+  handler: async (ctx) => {
+    const cities = await ctx.db.query('cities').collect();
+
+    // Group cities by value to separate on frontend
+    const groupedCities = {
+      existing: cities.filter((city) => !city.value.endsWith('-new')),
+      new: cities.filter((city) => city.value.endsWith('-new')),
+    };
+
+    return groupedCities;
+  },
+});

@@ -26,7 +26,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from './ui/select';
@@ -41,11 +43,12 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from './ui/checkbox';
 import { MouseEvent } from 'react';
 import { Input } from './ui/input';
-import { useMutation } from 'convex/react';
+import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 import { Id } from '@/convex/_generated/dataModel';
 import { SidebarMenuButton } from './ui/sidebar';
+import { Cities, GroupedCities } from '@/lib/types';
 
 function ImageDropzone({
   onChange,
@@ -148,9 +151,11 @@ const formSchema = z.object({
 });
 
 function CreatePostForm({
+  cities,
   type,
   setOpen,
 }: {
+  cities: GroupedCities;
   type: string;
   setOpen: (open: boolean) => void;
 }) {
@@ -183,13 +188,13 @@ function CreatePostForm({
         if (file) {
           const postUrl = await generateUploadUrl();
 
-          const result = await fetch(postUrl, {
+          const response = await fetch(postUrl, {
             method: 'POST',
             headers: { 'Content-Type': file.type },
             body: file,
           });
 
-          const { storageId } = await result.json();
+          const { storageId } = await response.json();
           imageStorageId = storageId;
         }
       } catch (error) {
@@ -201,6 +206,7 @@ function CreatePostForm({
         );
         return;
       }
+      // check to make sure the content has no curse words
       const res = await createTweak({
         isAnonymous: values.anonymous,
         title: values.title,
@@ -232,18 +238,36 @@ function CreatePostForm({
                     <SelectValue placeholder="Select a city" />
                   </SelectTrigger>
                   <SelectContent>
-                    {top25Cities.map((city) => (
-                      <SelectItem key={city.value} value={city.value}>
-                        <div className="flex items-center gap-2">
-                          <img
-                            src={city.flag}
-                            alt={city.city}
-                            className="w-4 h-4 rounded-full object-contain"
-                          />
-                          {city.city}, {city.state}
-                        </div>
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      <SelectLabel>User Added Cities</SelectLabel>
+                      {cities.new?.map((city) => (
+                        <SelectItem key={city.value} value={city.value}>
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={city.flag}
+                              alt={city.city}
+                              className="w-4 h-4 rounded-full object-contain"
+                            />
+                            {city.city}, {city.region}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Top 25 U.S. Cities</SelectLabel>
+                      {cities.existing?.map((city) => (
+                        <SelectItem key={city.value} value={city.value}>
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={city.flag}
+                              alt={city.city}
+                              className="w-4 h-4 rounded-full object-contain"
+                            />
+                            {city.city}, {city.region}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -358,6 +382,7 @@ function CreatePostForm({
 
 export function CreateCityTweakButton({ sidebar }: { sidebar?: boolean }) {
   const [open, setOpen] = useState(false);
+  const cities = useQuery(api.cities.getCities);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -367,7 +392,7 @@ export function CreateCityTweakButton({ sidebar }: { sidebar?: boolean }) {
             Create City Tweak
           </SidebarMenuButton>
         ) : (
-          <Button className="w-full" variant={'outline'}>
+          <Button variant={'outline'} size={'icon'}>
             <SquarePen />
           </Button>
         )}
@@ -386,10 +411,18 @@ export function CreateCityTweakButton({ sidebar }: { sidebar?: boolean }) {
             <TabsTrigger value="image">Image</TabsTrigger>
           </TabsList>
           <TabsContent value="post">
-            <CreatePostForm type="post" setOpen={setOpen} />
+            <CreatePostForm
+              type="post"
+              cities={cities ?? { existing: [], new: [] }}
+              setOpen={setOpen}
+            />
           </TabsContent>
           <TabsContent value="image">
-            <CreatePostForm type="image" setOpen={setOpen} />
+            <CreatePostForm
+              type="image"
+              cities={cities ?? { existing: [], new: [] }}
+              setOpen={setOpen}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>

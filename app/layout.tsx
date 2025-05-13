@@ -7,6 +7,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { ClerkProvider } from '@clerk/nextjs';
 import { ConvexClientProvider } from './convex-client-provider';
 import { Toaster } from 'sonner';
+import { RightMenu } from '@/components/right-menu';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -41,11 +42,9 @@ export default function RootLayout({
                 <Header />
                 <div className="flex">
                   <div className="flex flex-1">
-                    <div className="w-full">{children}</div>
-                    <div className="hidden xl:block w-96 sticky top-20 h-[calc(100vh-5rem)]">
-                      <div className="flex justify-center items-center p-4">
-                        right menu
-                      </div>
+                    <div className="min-h-screen w-full">{children}</div>
+                    <div className="border-l border-l-yellow-500">
+                      <RightMenu />
                     </div>
                   </div>
                 </div>

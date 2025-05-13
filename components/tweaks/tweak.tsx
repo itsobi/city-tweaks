@@ -31,9 +31,6 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
   const votes = useQuery(api.votes.getVotes, {
     tweakId: tweak._id,
   });
-  const comments = useQuery(api.comments.getComments, {
-    tweakId: tweak._id,
-  });
   const numberOfComments = useQuery(api.comments.getCommentsLength, {
     tweakId: tweak._id,
   });
@@ -47,12 +44,12 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
 
   const handleVote = (voteType: 'up' | 'down') => {
     startTransition(async () => {
-      const result = await vote({
+      const response = await vote({
         tweakId: tweak._id,
         voteType,
       });
-      if (!result?.success) {
-        toast.error(result?.message ?? 'An error occurred');
+      if (!response?.success) {
+        toast.error(response?.message ?? 'An error occurred');
       }
     });
   };
@@ -62,7 +59,7 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
   return (
     <div
       className={cn(
-        'flex w-full border-b border-r border-gray-200 p-4',
+        'flex w-full border-b border-yellow-500 p-4',
         isLast && 'border-b-0'
       )}
     >
@@ -149,7 +146,7 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
           <p className="text-sm lg:text-base">{tweak.content}</p>
           {/* Image */}
           {tweak.imageUrl && (
-            <div className="max-w-2xl">
+            <div className="max-w-2xl py-4">
               <img
                 src={tweak.imageUrl}
                 alt={tweak.title}
@@ -203,6 +200,8 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
             tweakId={tweak._id}
             reply={false}
             setReply={setReply}
+            tweakAuthorId={tweak.authorId}
+            city={tweak.city}
           />
         )}
       </div>

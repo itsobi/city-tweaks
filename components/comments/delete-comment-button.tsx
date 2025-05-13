@@ -31,15 +31,15 @@ export function DeleteCommentButton({
 
   const handleDeleteComment = async () => {
     startTransition(async () => {
-      const result = await deleteComment({
+      const response = await deleteComment({
         commentId,
         authorId,
       });
 
-      if (result.success) {
-        toast.success(result.message);
+      if (response.success) {
+        toast.success(response.message);
       } else {
-        toast.error(result.message);
+        toast.error(response.message);
       }
       setIsOpen(false);
     });

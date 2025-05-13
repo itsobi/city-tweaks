@@ -1,5 +1,4 @@
 import { Alert } from '@/components/alert';
-import { TweakLoadingSkeleton } from '@/components/tweaks/tweak-loading-skeleton';
 import { TweakWrapper } from '@/components/tweaks/tweak-wrapper';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';

@@ -1,17 +1,33 @@
 import { AddCityForm } from '@/components/cities/add-city-from';
-import { UserProfile } from '@clerk/nextjs';
+import { api } from '@/convex/_generated/api';
+import { auth } from '@clerk/nextjs/server';
+import { preloadQuery } from 'convex/nextjs';
+import { redirect } from 'next/navigation';
 
-export default function AddCityPage() {
+export default async function AddCityPage() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    redirect('/');
+  }
+
+  const preloadedUserRequest = await preloadQuery(api.requests.userRequest, {
+    userId,
+  });
   return (
     <div className="p-4">
       <div className="flex flex-col gap-1 mb-8">
         <h1 className="text-2xl font-bold">Add City</h1>
         <p className="text-sm text-muted-foreground">
           Didn't see your city? No worries! Add it here and we'll get it added
-          for you.
+          for you.{' '}
         </p>
       </div>
-      <AddCityForm />
+
+      <AddCityForm
+        preloadedUserRequest={preloadedUserRequest}
+        userId={userId}
+      />
     </div>
   );
 }

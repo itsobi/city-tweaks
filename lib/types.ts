@@ -1,4 +1,5 @@
 import { Id } from '@/convex/_generated/dataModel';
+import { RegisteredQuery } from 'convex/server';
 
 export type UserType = {
   _id: Id<'users'>;
@@ -29,4 +30,20 @@ export type Comment = {
   content: string;
   tweakId?: Id<'tweaks'>;
   isParent: boolean;
+};
+
+type City = {
+  _id: Id<'cities'>;
+  _creationTime: number;
+  city: string;
+  value: string;
+  region: string;
+  flag: string;
+};
+
+export type Cities = City[] | undefined;
+
+export type GroupedCities = {
+  existing: City[];
+  new: City[];
 };

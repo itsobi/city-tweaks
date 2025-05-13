@@ -57,11 +57,11 @@ export function AppSidebar() {
       >
         <Image src={logo} alt="logo" className="h-32 w-32 object-contain" />
       </Link>
-      <SidebarGroup className="mt-12">
-        <SidebarGroupLabel>Actions</SidebarGroupLabel>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            <SignedIn>
+      <SignedIn>
+        <SidebarGroup className="mt-12">
+          <SidebarGroupLabel>Actions</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               <SidebarMenuItem>
                 <CreateCityTweakButton sidebar={true} />
               </SidebarMenuItem>
@@ -78,10 +78,10 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            </SignedIn>
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SignedIn>
       <SidebarContent />
       <SidebarFooter>
         <SidebarMenu>

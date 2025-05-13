@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem } from '../ui/form';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   reply: z
@@ -28,6 +29,8 @@ interface CreateReplyFormProps {
   commentId?: Id<'comments'>;
   reply: boolean;
   setReply: Dispatch<SetStateAction<boolean>>;
+  tweakAuthorId: string;
+  city: string;
 }
 
 export function CreateReplyForm({
@@ -35,10 +38,12 @@ export function CreateReplyForm({
   commentId,
   reply,
   setReply,
+  tweakAuthorId,
+  city,
 }: CreateReplyFormProps) {
   const [isPending, startTransition] = useTransition();
   const [replyIsPending, replyStartTransition] = useTransition();
-
+  const router = useRouter();
   const comment = useMutation(api.tweaks.comment);
   const sendReply = useMutation(api.comments.reply);
 
@@ -64,17 +69,17 @@ export function CreateReplyForm({
 
     if (reply && commentId && tweakId) {
       replyStartTransition(async () => {
-        const result = await sendReply({
+        const response = await sendReply({
           content: values.reply,
           isParent: false,
           parentCommentId: commentId,
           tweakId: tweakId,
         });
-        if (result.success) {
-          toast.success(result.message);
+        if (response.success) {
+          toast.success(response.message);
           form.reset();
         } else {
-          toast.error(result.message);
+          toast.error(response.message);
         }
       });
       setReply(false);
@@ -87,18 +92,20 @@ export function CreateReplyForm({
     }
 
     startTransition(async () => {
-      const result = await comment({
+      const response = await comment({
         tweakId,
         content: values.reply,
         isParent: true,
         parentCommentId: undefined,
+        tweakAuthorId,
+        city,
       });
-      if (result.success) {
-        toast.success(result.message);
+      if (response.success) {
+        toast.success(response.message);
         form.reset();
-        // TODO: route to post page
+        router.push(`/cT/${city}/${tweakId}`);
       } else {
-        toast.error(result.message);
+        toast.error(response.message);
       }
     });
   }

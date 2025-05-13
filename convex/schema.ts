@@ -35,8 +35,22 @@ export default defineSchema({
   }).index('by_tweak_id', ['tweakId']),
   cities: defineTable({
     city: v.string(),
-    state: v.string(),
+    region: v.string(),
     value: v.string(),
     flag: v.string(),
   }),
+  userRequests: defineTable({
+    clerkId: v.string(),
+    lastRequestTimestamp: v.number(),
+    requestCount: v.number(),
+    timezone: v.string(), // timezone of the user
+  }).index('by_clerk_id', ['clerkId']),
+  notifications: defineTable({
+    authorClerkId: v.string(),
+    type: v.union(v.literal('comment'), v.literal('reply')),
+    read: v.boolean(),
+    tweakId: v.id('tweaks'),
+    city: v.string(),
+    senderClerkId: v.string(),
+  }).index('by_author_clerk_id', ['authorClerkId']),
 });

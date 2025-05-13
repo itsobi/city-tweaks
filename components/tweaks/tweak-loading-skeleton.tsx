@@ -4,7 +4,7 @@ import { Skeleton } from '../ui/skeleton';
 
 export function TweakLoadingSkeleton() {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 p-4">
       <div className="flex w-full border-b border-gray-200">
         {/* Voting skeleton */}
         <div className="w-6 flex flex-col items-center gap-0.5 py-2">

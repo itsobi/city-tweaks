@@ -5,18 +5,32 @@ import { CreateCityTweakButton } from '../create-city-tweak-button';
 import { SignedIn } from '@clerk/nextjs';
 import { SignedOut, SignInButton } from '@clerk/nextjs';
 import { LogIn } from 'lucide-react';
+import { Notifications } from './notifications';
 
-export function Header() {
+import { preloadQuery } from 'convex/nextjs';
+import { api } from '@/convex/_generated/api';
+import { auth } from '@clerk/nextjs/server';
+
+export async function Header() {
+  const { userId } = await auth();
+  const preloadedNotifications = await preloadQuery(
+    api.notifications.getNotifications,
+    {
+      clerkId: userId ?? '',
+    }
+  );
   return (
-    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16 overflow-x-hidden">
+    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16 z-50">
       <SidebarTrigger />
 
       {/* Hidden div for spacing */}
       <div className="hidden md:block" />
 
-      <HeaderSearch />
+      <div className="w-[300px]">
+        <HeaderSearch />
+      </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <SignedOut>
           <SignInButton mode="modal">
             <Button variant="outline">
@@ -25,7 +39,10 @@ export function Header() {
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <CreateCityTweakButton />
+          <Notifications preloadedNotifications={preloadedNotifications} />
+          <div>
+            <CreateCityTweakButton />
+          </div>
         </SignedIn>
       </div>
     </header>

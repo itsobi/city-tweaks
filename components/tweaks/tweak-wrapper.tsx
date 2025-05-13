@@ -5,7 +5,6 @@ import { Preloaded, usePreloadedQuery } from 'convex/react';
 import { Tweak } from './tweak';
 import { useEffect } from 'react';
 import { Comment } from '../comments/comment';
-import { Alert } from '../alert';
 
 interface TweaksWrapperProps {
   preloadedTweak: Preloaded<typeof api.tweaks.getTweak>;
@@ -24,8 +23,6 @@ export function TweakWrapper({
   const comments = usePreloadedQuery(preloadedComments);
   const numberOfComments = usePreloadedQuery(preloadedNumberOfComments);
 
-  console.log(tweak);
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -35,18 +32,24 @@ export function TweakWrapper({
   }
 
   return (
-    <div className="flex flex-col gap-8 p-2">
+    <div className="flex flex-col">
       <Tweak isLast={false} tweak={tweak} userId={userId ?? ''} />
-      <div className="flex flex-col gap-4">
-        <h3 className="font-semibold">Comments ({numberOfComments ?? 0})</h3>
-        {comments.map((comment) => (
-          <Comment
-            key={comment._id}
-            comment={comment}
-            tweakId={tweak._id}
-            userId={userId}
-          />
-        ))}
+      <div className="p-4">
+        <div className="flex flex-col gap-4">
+          <h3 className="font-semibold pl-2">
+            Comments ({numberOfComments ?? 0})
+          </h3>
+          <div className="">
+            {comments.map((comment) => (
+              <Comment
+                key={comment._id}
+                comment={comment}
+                tweakId={tweak._id}
+                userId={userId}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -87,6 +87,7 @@ export const reply = mutation({
         parentCommentId: args.parentCommentId,
         tweakId: args.tweakId,
       });
+      // TODO: send notification to the tweak author
       return { success: true, message: 'Reply created successfully!' };
     } catch (error) {
       console.error(error);

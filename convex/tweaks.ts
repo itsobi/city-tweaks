@@ -116,9 +116,14 @@ export const deleteTweak = mutation({
         .withIndex('by_tweak_id', (q) => q.eq('tweakId', args.tweakId))
         .collect();
 
-      for (const comment of commentsToDelete) {
-        await ctx.db.delete(args.tweakId);
+      if (commentsToDelete.length > 0) {
+        for (const comment of commentsToDelete) {
+          await ctx.db.delete(comment._id);
+        }
       }
+
+      // Delete the tweak itself
+      await ctx.db.delete(args.tweakId);
 
       if (args.storageId) {
         await ctx.storage.delete(args.storageId);
@@ -143,6 +148,8 @@ export const comment = mutation({
     parentCommentId: v.optional(v.id('comments')),
     content: v.string(),
     isParent: v.boolean(),
+    tweakAuthorId: v.string(),
+    city: v.string(),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -175,6 +182,15 @@ export const comment = mutation({
         content: args.content,
         parentCommentId: args.parentCommentId,
         isParent: args.isParent,
+      });
+      // TODO: send notification to the tweak author
+
+      await ctx.runMutation(api.notifications.createNotification, {
+        type: 'comment',
+        authorId: args.tweakAuthorId,
+        city: args.city,
+        tweakId: args.tweakId,
+        senderClerkId: userId,
       });
       return { success: true, message: 'Comment sent successfully!' };
     } catch (error) {
