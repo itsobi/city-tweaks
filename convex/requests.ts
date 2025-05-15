@@ -32,20 +32,21 @@ export const updateUserRequest = mutation({
       .first();
 
     const now = Date.now();
-    const timezone = args.userTimezone || userRequest?.timezone || 'UTC'; // user timezone or default to UTC
+    const timezone = args.userTimezone || userRequest?.timezone || 'UTC';
 
-    // get start of day in user's timezone
-    const userDate = new Date().toLocaleString('en-US', {
-      timeZone: timezone,
-    });
-    const startOfDay = new Date(userDate).setHours(0, 0, 0, 0);
+    // Convert current timestamp to user's timezone and get start of day
+    const userDate = new Date(now);
+    const startOfDay = new Date(
+      userDate.toLocaleString('en-US', { timeZone: timezone })
+    ).setHours(0, 0, 0, 0);
 
     if (userRequest) {
-      // Get start of last request's day in user's timezone
-      const lastRequestDate = new Date(
-        userRequest.lastRequestTimestamp
-      ).toLocaleString('en-US', { timeZone: timezone });
-      const lastRequestDay = new Date(lastRequestDate).setHours(0, 0, 0, 0);
+      // Convert last request timestamp to user's timezone
+      const lastRequestDate = new Date(userRequest.lastRequestTimestamp);
+      const lastRequestDay = new Date(
+        lastRequestDate.toLocaleString('en-US', { timeZone: timezone })
+      ).setHours(0, 0, 0, 0);
+
       const isNewDay = lastRequestDay < startOfDay;
 
       if (isNewDay) {
@@ -81,5 +82,41 @@ export const updateUserRequest = mutation({
       success: true,
       message: 'User request updated',
     };
+  },
+});
+
+// ... existing code ...
+
+// Add this new scheduled task
+export const resetDailyRequests = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const now = Date.now();
+
+    // Get all user requests
+    const userRequests = await ctx.db.query('userRequests').collect();
+
+    for (const request of userRequests) {
+      const timezone = request.timezone || 'UTC';
+
+      // Convert current timestamp to user's timezone and get start of day
+      const userDate = new Date(now);
+      const startOfDay = new Date(
+        userDate.toLocaleString('en-US', { timeZone: timezone })
+      ).setHours(0, 0, 0, 0);
+
+      // Convert last request timestamp to user's timezone
+      const lastRequestDate = new Date(request.lastRequestTimestamp);
+      const lastRequestDay = new Date(
+        lastRequestDate.toLocaleString('en-US', { timeZone: timezone })
+      ).setHours(0, 0, 0, 0);
+
+      // Reset if last request was from a previous day
+      if (lastRequestDay < startOfDay) {
+        await ctx.db.patch(request._id, {
+          requestCount: 0,
+        });
+      }
+    }
   },
 });

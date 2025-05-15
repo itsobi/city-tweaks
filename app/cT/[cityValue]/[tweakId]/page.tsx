@@ -8,7 +8,7 @@ import { preloadQuery } from 'convex/nextjs';
 export default async function TweakPage({
   params,
 }: {
-  params: Promise<{ tweakCity: string; tweakId: Id<'tweaks'> }>;
+  params: Promise<{ cityValue: string; tweakId: Id<'tweaks'> }>;
 }) {
   const { tweakId } = await params;
   const { userId } = await auth();

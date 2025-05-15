@@ -33,8 +33,13 @@ export async function Header() {
       <div className="flex items-center gap-1.5">
         <SignedOut>
           <SignInButton mode="modal">
-            <Button variant="outline">
+            <Button variant="outline" className="hidden lg:flex items-center">
               <LogIn /> Sign In
+            </Button>
+          </SignInButton>
+          <SignInButton mode="modal">
+            <Button variant="outline" size={'icon'} className="lg:hidden">
+              <LogIn />
             </Button>
           </SignInButton>
         </SignedOut>

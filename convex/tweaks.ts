@@ -56,11 +56,68 @@ export const getTweaks = query({
   handler: async (ctx) => {
     const tweaks = await ctx.db.query('tweaks').order('desc').collect();
 
-    const votes = await ctx.db.query('votes').collect();
+    // Get votes for each tweak individually
+    const votes = await Promise.all(
+      tweaks.map((tweak) =>
+        ctx.db
+          .query('votes')
+          .withIndex('by_tweak_id', (q) => q.eq('tweakId', tweak._id))
+          .collect()
+      )
+    );
 
     // Create a map of vote counts for each tweak
     const voteCountMap = new Map();
-    votes.forEach((voteDoc) => {
+    votes.flat().forEach((voteDoc) => {
+      const upvotes = voteDoc.votes.filter((v) => v.voteType === 'up').length;
+      const downvotes = voteDoc.votes.filter(
+        (v) => v.voteType === 'down'
+      ).length;
+      voteCountMap.set(voteDoc.tweakId, upvotes - downvotes);
+    });
+
+    // Sort tweaks by vote count
+    const sortedTweaks = tweaks.sort((a, b) => {
+      const aVotes = voteCountMap.get(a._id) || 0;
+      const bVotes = voteCountMap.get(b._id) || 0;
+      return bVotes - aVotes; // Sort in descending order
+    });
+
+    const enrichedTweaks = await enrichWithUsers(ctx, sortedTweaks);
+
+    return await Promise.all(
+      enrichedTweaks.map(async (tweak) => ({
+        ...tweak,
+        ...(tweak.imageStorageId
+          ? { imageUrl: await ctx.storage.getUrl(tweak.imageStorageId) }
+          : {}),
+      }))
+    );
+  },
+});
+
+export const getTweaksByCityValue = query({
+  args: { cityValue: v.string() },
+  handler: async (ctx, args) => {
+    const tweaks = await ctx.db
+      .query('tweaks')
+      .withIndex('by_city', (q) => q.eq('city', args.cityValue))
+      .order('desc')
+      .collect();
+
+    // Get votes for each tweak individually
+    const votes = await Promise.all(
+      tweaks.map((tweak) =>
+        ctx.db
+          .query('votes')
+          .withIndex('by_tweak_id', (q) => q.eq('tweakId', tweak._id))
+          .collect()
+      )
+    );
+
+    // Create a map of vote counts for each tweak
+    const voteCountMap = new Map();
+    votes.flat().forEach((voteDoc) => {
       const upvotes = voteDoc.votes.filter((v) => v.voteType === 'up').length;
       const downvotes = voteDoc.votes.filter(
         (v) => v.voteType === 'down'

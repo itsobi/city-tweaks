@@ -38,7 +38,7 @@ export default defineSchema({
     region: v.string(),
     value: v.string(),
     flag: v.string(),
-  }),
+  }).index('by_value', ['value']),
   userRequests: defineTable({
     clerkId: v.string(),
     lastRequestTimestamp: v.number(),

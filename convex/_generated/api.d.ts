@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as cities from "../cities.js";
 import type * as comments from "../comments.js";
+import type * as crons from "../crons.js";
 import type * as notifications from "../notifications.js";
 import type * as requests from "../requests.js";
 import type * as tweaks from "../tweaks.js";
@@ -32,6 +33,7 @@ import type * as votes from "../votes.js";
 declare const fullApi: ApiFromModules<{
   cities: typeof cities;
   comments: typeof comments;
+  crons: typeof crons;
   notifications: typeof notifications;
   requests: typeof requests;
   tweaks: typeof tweaks;

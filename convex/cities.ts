@@ -71,3 +71,43 @@ export const getCities = query({
     return groupedCities;
   },
 });
+
+export const getNewCities = query({
+  args: {},
+  handler: async (ctx) => {
+    const cities = await ctx.db.query('cities').collect();
+    return cities.filter((city) => city.value.endsWith('-new'));
+  },
+});
+
+export const getPopularCities = query({
+  args: {},
+  handler: async (ctx) => {
+    const tweaks = await ctx.db.query('tweaks').collect();
+
+    // Count occurrences of each city
+    const cityCounts = tweaks.reduce(
+      (acc, tweak) => {
+        acc[tweak.city] = (acc[tweak.city] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    const popularCities = await Promise.all(
+      Object.entries(cityCounts).map(async ([cityValue, count]) => {
+        const cityInfo = await ctx.db
+          .query('cities')
+          .withIndex('by_value', (q) => q.eq('value', cityValue))
+          .first();
+
+        return {
+          cityInfo, // Return the entire city document
+          count: count, // Use the actual count for this specific city
+        };
+      })
+    );
+
+    return popularCities;
+  },
+});

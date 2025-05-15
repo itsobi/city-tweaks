@@ -38,7 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useCallback, useState, useTransition } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Link from 'next/link';
-import { Camera, SquarePen, Trash } from 'lucide-react';
+import { Camera, Plus, SquarePen, Trash } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from './ui/checkbox';
 import { MouseEvent } from 'react';
@@ -380,7 +380,13 @@ function CreatePostForm({
   );
 }
 
-export function CreateCityTweakButton({ sidebar }: { sidebar?: boolean }) {
+export function CreateCityTweakButton({
+  sidebar,
+  plusIcon,
+}: {
+  sidebar?: boolean;
+  plusIcon?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const cities = useQuery(api.cities.getCities);
   return (
@@ -391,6 +397,10 @@ export function CreateCityTweakButton({ sidebar }: { sidebar?: boolean }) {
             <SquarePen />
             Create City Tweak
           </SidebarMenuButton>
+        ) : plusIcon ? (
+          <Button variant={'ghost'} size={'icon'}>
+            <Plus />
+          </Button>
         ) : (
           <Button variant={'outline'} size={'icon'}>
             <SquarePen />

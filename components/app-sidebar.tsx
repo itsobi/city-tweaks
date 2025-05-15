@@ -35,28 +35,28 @@ import { Button } from './ui/button';
 import Link from 'next/link';
 import { CreateCityTweakButton } from './create-city-tweak-button';
 import { usePathname } from 'next/navigation';
+import { useCityTweakStore } from '@/lib/store';
 
 export function AppSidebar() {
   const { user } = useUser();
   const { isMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
 
-  const isManageAccountPage = pathname === '/manage-account';
-
   return (
     <Sidebar
       variant="sidebar"
       className="border-r-4 border-yellow-500 shadow z-50"
     >
-      <Link
-        href={'/'}
-        onClick={() => {
-          if (isMobile) toggleSidebar();
-        }}
-        className="flex justify-center w-full h-10"
-      >
-        <Image src={logo} alt="logo" className="h-32 w-32 object-contain" />
-      </Link>
+      <div className="flex justify-center">
+        <Link
+          href={'/'}
+          onClick={() => {
+            if (isMobile) toggleSidebar();
+          }}
+        >
+          <Image src={logo} alt="logo" className="h-32 w-32 object-contain" />
+        </Link>
+      </div>
       <SignedIn>
         <SidebarGroup className="mt-12">
           <SidebarGroupLabel>Actions</SidebarGroupLabel>
@@ -66,7 +66,7 @@ export function AppSidebar() {
                 <CreateCityTweakButton sidebar={true} />
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton asChild isActive={pathname === '/add-city'}>
                   <Link
                     onClick={() => {
                       if (isMobile) toggleSidebar();
