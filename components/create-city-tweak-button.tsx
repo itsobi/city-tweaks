@@ -83,6 +83,7 @@ function ImageDropzone({
     e.stopPropagation();
     setFile(null);
     setImagePreview(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onChange(undefined as any); // Clear the form value
   };
 
