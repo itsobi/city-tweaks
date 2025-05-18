@@ -20,7 +20,16 @@ export async function RightMenu() {
     <div className="flex flex-col gap-8">
       <div>
         <div className="flex justify-between items-center mb-2">
-          <p className="font-semibold text-muted-foreground">New Cities</p>
+          <p className="font-semibold text-muted-foreground">
+            🔥 Popular City Tweaks
+          </p>
+          {userId && <CreateCityTweakButton plusIcon />}
+        </div>
+        <PopularCities preloadedPopularCities={preloadedPopularCities} />
+      </div>
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <p className="font-semibold text-muted-foreground">🆕 New Cities</p>
           {userId && (
             <Button variant="ghost" size="icon" asChild>
               <Link href="/add-city">
@@ -30,15 +39,6 @@ export async function RightMenu() {
           )}
         </div>
         <NewCities preloadedNewCities={preloadedNewCities} />
-      </div>
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <p className="font-semibold text-muted-foreground">
-            Popular City Tweaks
-          </p>
-          {userId && <CreateCityTweakButton plusIcon />}
-        </div>
-        <PopularCities preloadedPopularCities={preloadedPopularCities} />
       </div>
     </div>
   );

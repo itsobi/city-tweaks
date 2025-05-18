@@ -17,6 +17,11 @@ export const createNotification = mutation({
 
     const userId = identity.subject;
 
+    // Don't send notifications to yourself
+    if (args.authorId === userId) {
+      return;
+    }
+
     await ctx.db.insert('notifications', {
       authorClerkId: args.authorId,
       senderClerkId: args.senderClerkId,

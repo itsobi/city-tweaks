@@ -388,7 +388,7 @@ export function CreateCityTweakButton({
   plusIcon?: boolean;
 }) {
   const [open, setOpen] = useState(false);
-  const cities = useQuery(api.cities.getCities);
+  const cities = useQuery(api.cities.getGroupedCities);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>

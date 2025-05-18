@@ -112,12 +112,17 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
               </div>
             ) : (
               <div className="flex items-center gap-1">
-                <Avatar className="h-5 w-5 lg:h-6 lg:w-6">
+                {/* <Avatar className="h-5 w-5 lg:h-6 lg:w-6 relative">
                   <AvatarImage src={tweak.author?.imageUrl} />
                   <AvatarFallback>
                     {tweak.author?.username?.charAt(0)}
                   </AvatarFallback>
-                </Avatar>
+                </Avatar> */}
+                <img
+                  src={tweak.author?.imageUrl}
+                  alt={tweak.author?.username}
+                  className="h-5 w-5 lg:h-6 lg:w-6 rounded-full"
+                />
                 <span>
                   Posted by{' '}
                   <span className="lg:text-sm text-black">

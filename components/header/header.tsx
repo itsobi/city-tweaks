@@ -10,6 +10,7 @@ import { Notifications } from './notifications';
 import { preloadQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { auth } from '@clerk/nextjs/server';
+import { ComboboxDemo } from './test';
 
 export async function Header() {
   const { userId } = await auth();
@@ -19,15 +20,17 @@ export async function Header() {
       clerkId: userId ?? '',
     }
   );
+  const preloadedCities = await preloadQuery(api.cities.getGroupedCities);
   return (
-    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16 z-50">
+    <header className="flex items-center justify-between gap-4 px-4 border-b border-yellow-500 sticky top-0 bg-background h-16">
       <SidebarTrigger />
 
       {/* Hidden div for spacing */}
       <div className="hidden md:block" />
 
-      <div className="w-[300px]">
-        <HeaderSearch />
+      <div className="w-[300px] xl:w-[400px]">
+        <HeaderSearch preloadedCities={preloadedCities} />
+        {/* <ComboboxDemo /> */}
       </div>
 
       <div className="flex items-center gap-1.5">

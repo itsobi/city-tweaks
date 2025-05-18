@@ -57,7 +57,7 @@ export const addCity = mutation({
   },
 });
 
-export const getCities = query({
+export const getGroupedCities = query({
   args: {},
   handler: async (ctx) => {
     const cities = await ctx.db.query('cities').collect();
@@ -75,8 +75,8 @@ export const getCities = query({
 export const getNewCities = query({
   args: {},
   handler: async (ctx) => {
-    const cities = await ctx.db.query('cities').collect();
-    return cities.filter((city) => city.value.endsWith('-new'));
+    const cities = await ctx.db.query('cities').order('desc').collect();
+    return cities.filter((city) => city.value.endsWith('-new')).slice(0, 5);
   },
 });
 
