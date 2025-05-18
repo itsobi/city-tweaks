@@ -85,3 +85,14 @@ export const markAsRead = mutation({
     await ctx.db.patch(args.notificationId, { read: true });
   },
 });
+
+export const markAllAsRead = mutation({
+  args: {
+    notificationIds: v.array(v.id('notifications')),
+  },
+  handler: async (ctx, args) => {
+    await Promise.all(
+      args.notificationIds.map((id) => ctx.db.patch(id, { read: true }))
+    );
+  },
+});

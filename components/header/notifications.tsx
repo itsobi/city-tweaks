@@ -27,7 +27,7 @@ export function Notifications({
   const notifications = usePreloadedQuery(preloadedNotifications);
 
   const markAsRead = useMutation(api.notifications.markAsRead);
-
+  const markAllAsRead = useMutation(api.notifications.markAllAsRead);
   if (notifications?.length) {
     return (
       <DropdownMenu>
@@ -62,6 +62,18 @@ export function Notifications({
               </Link>
             </DropdownMenuItem>
           ))}
+          <DropdownMenuSeparator />
+          <Button
+            variant={'link'}
+            className="w-full text-sm text-muted-foreground"
+            onClick={() =>
+              markAllAsRead({
+                notificationIds: notifications.map((n) => n._id),
+              })
+            }
+          >
+            Mark all as read
+          </Button>
         </DropdownMenuContent>
       </DropdownMenu>
     );

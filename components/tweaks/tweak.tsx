@@ -174,21 +174,22 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
                 : 'Comments'}
             </button>
           )}
-          {reply ? (
-            <button
-              onClick={() => setReply(!reply)}
-              className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
-            >
-              <ChevronUp className="w-3 h-3" /> Close
-            </button>
-          ) : (
-            <button
-              onClick={() => setReply(!reply)}
-              className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
-            >
-              <Reply className="w-3 h-3" /> Reply
-            </button>
-          )}
+          {userId &&
+            (reply ? (
+              <button
+                onClick={() => setReply(!reply)}
+                className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+              >
+                <ChevronUp className="w-3 h-3" /> Close
+              </button>
+            ) : (
+              <button
+                onClick={() => setReply(!reply)}
+                className="flex items-center gap-1 cursor-pointer hover:text-yellow-500"
+              >
+                <Reply className="w-3 h-3" /> Reply
+              </button>
+            ))}
           {!isOnTweakPage && (
             <button
               onClick={() => router.push(`/cT/${tweak.city}/${tweak._id}`)}
