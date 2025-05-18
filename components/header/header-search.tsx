@@ -78,27 +78,29 @@ export function HeaderSearch({
                 ))}
               </CommandGroup>
             )}
-            <CommandGroup heading="Top 25 U.S. Cities">
-              {groupedCities.existing.map((city) => (
-                <CommandItem
-                  key={city.value}
-                  value={city.value}
-                  onSelect={(currentValue) => {
-                    setValue(city.city);
-                    setOpen(false);
-                    router.push(`/cT/${currentValue}`);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <img
-                    src={city.flag}
-                    alt={city.city}
-                    className="w-4 h-4 rounded-full object-cover"
-                  />
-                  <p className="text-sm">{city.city}</p>
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {groupedCities.existing.length > 0 && (
+              <CommandGroup heading="Top 25 U.S. Cities">
+                {groupedCities.existing.map((city) => (
+                  <CommandItem
+                    key={city.value}
+                    value={city.value}
+                    onSelect={(currentValue) => {
+                      setValue(city.city);
+                      setOpen(false);
+                      router.push(`/cT/${currentValue}`);
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <img
+                      src={city.flag}
+                      alt={city.city}
+                      className="w-4 h-4 rounded-full object-cover"
+                    />
+                    <p className="text-sm">{city.city}</p>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         )}
       </Command>
