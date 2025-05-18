@@ -46,6 +46,7 @@ export function TweakWrapper({
                 comment={comment}
                 tweakId={tweak._id}
                 userId={userId}
+                city={tweak.city}
               />
             ))}
           </div>

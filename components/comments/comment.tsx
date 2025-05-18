@@ -14,11 +14,12 @@ import { CreateReplyForm } from '../tweaks/create-reply-form';
 
 interface CommentProps {
   comment: CommentType;
+  city: string;
   tweakId: Id<'tweaks'>;
   userId: string | null;
 }
 
-export function Comment({ comment, tweakId, userId }: CommentProps) {
+export function Comment({ comment, tweakId, userId, city }: CommentProps) {
   const [reply, setReply] = useState(false);
   const replies = useQuery(api.comments.getReplies, {
     parentCommentId: comment._id,
@@ -72,6 +73,8 @@ export function Comment({ comment, tweakId, userId }: CommentProps) {
             tweakId={tweakId}
             reply={true}
             setReply={setReply}
+            tweakAuthorId={comment.authorId}
+            city={city}
           />
         )}
 
@@ -83,6 +86,7 @@ export function Comment({ comment, tweakId, userId }: CommentProps) {
               comment={reply}
               tweakId={tweakId}
               userId={userId}
+              city={city}
             />
           ))}
         </div>
