@@ -4,7 +4,6 @@ import { api } from '@/convex/_generated/api';
 import { Preloaded, usePreloadedQuery } from 'convex/react';
 import { Tweak } from './tweak';
 import { useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export function TweaksByCityWrapper({
