@@ -4,7 +4,6 @@ import { api } from '@/convex/_generated/api';
 import { Preloaded, usePreloadedQuery } from 'convex/react';
 import { Tweak } from './tweak';
 import { useUser } from '@clerk/nextjs';
-import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -15,7 +14,6 @@ export function TweaksByCityWrapper({
 }) {
   const tweaks = usePreloadedQuery(preloadedTweaks);
   const { user } = useUser();
-  const router = useRouter();
 
   if (tweaks.length) {
     return (
@@ -37,10 +35,7 @@ export function TweaksByCityWrapper({
       <h1 className="text-sm text-muted-foreground">
         No City Tweaks found for this city
       </h1>
-      <Link
-        href="/"
-        className="text-sm text-yellow-500 text-muted-foreground hover:underline"
-      >
+      <Link href="/" className="text-sm text-yellow-500 hover:underline">
         Go to Home Page
       </Link>
     </div>

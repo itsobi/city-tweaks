@@ -11,7 +11,6 @@ import {
   Reply,
 } from 'lucide-react';
 import TimeStamp from './time-stamp';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useState, useTransition } from 'react';
@@ -112,12 +111,6 @@ export function Tweak({ tweak, userId, isLast }: TweakProps) {
               </div>
             ) : (
               <div className="flex items-center gap-1">
-                {/* <Avatar className="h-5 w-5 lg:h-6 lg:w-6 relative">
-                  <AvatarImage src={tweak.author?.imageUrl} />
-                  <AvatarFallback>
-                    {tweak.author?.username?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar> */}
                 <img
                   src={tweak.author?.imageUrl}
                   alt={tweak.author?.username}

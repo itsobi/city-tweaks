@@ -19,12 +19,7 @@ import { checkCity } from '@/lib/actions';
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { VerifyCityAlert } from '../verify-city-alert';
-import {
-  Preloaded,
-  useMutation,
-  usePreloadedQuery,
-  useQuery,
-} from 'convex/react';
+import { Preloaded, useMutation, usePreloadedQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { cn } from '@/lib/utils';
 
@@ -48,10 +43,8 @@ const formSchema = z.object({
 });
 
 export function AddCityForm({
-  userId,
   preloadedUserRequest,
 }: {
-  userId: string;
   preloadedUserRequest: Preloaded<typeof api.requests.userRequest>;
 }) {
   const [verifiedCity, setVerifiedCity] = useState<{

@@ -4,7 +4,7 @@ import { PopularCities } from './rightMenu/popular-cities';
 
 import { preloadQuery } from 'convex/nextjs';
 import { Button } from './ui/button';
-import { ChevronRightIcon, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { CreateCityTweakButton } from './create-city-tweak-button';
 import { auth } from '@clerk/nextjs/server';

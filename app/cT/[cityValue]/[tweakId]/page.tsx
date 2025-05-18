@@ -36,6 +36,7 @@ export default async function TweakPage({
       />
     );
   } catch (error) {
+    console.error(error);
     return (
       <Alert
         title="City Tweak not found"

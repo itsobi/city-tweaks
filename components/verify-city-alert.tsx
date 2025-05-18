@@ -11,8 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useRouter } from 'next/navigation';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
 interface VerifyCityAlertProps {
   city: string;
@@ -33,7 +32,6 @@ export function VerifyCityAlert({
   onConfirm,
   setVerifiedCity,
 }: VerifyCityAlertProps) {
-  const router = useRouter();
   return (
     <AlertDialog open={true}>
       <AlertDialogTrigger className="hidden">Open</AlertDialogTrigger>

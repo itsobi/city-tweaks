@@ -7,8 +7,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from '@/components/ui/command';
 
 import { useEffect, useRef, useState } from 'react';

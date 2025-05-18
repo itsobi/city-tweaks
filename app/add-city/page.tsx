@@ -19,15 +19,12 @@ export default async function AddCityPage() {
       <div className="flex flex-col gap-1 mb-8">
         <h1 className="text-2xl font-bold">Add City</h1>
         <p className="text-sm text-muted-foreground">
-          Didn't see your city? No worries! Add it here and we'll get it added
-          for you.{' '}
+          Didn&apos;t see your city? No worries! Add it here and we&apos;ll get
+          it added for you.{' '}
         </p>
       </div>
 
-      <AddCityForm
-        preloadedUserRequest={preloadedUserRequest}
-        userId={userId}
-      />
+      <AddCityForm preloadedUserRequest={preloadedUserRequest} />
     </div>
   );
 }

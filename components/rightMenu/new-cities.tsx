@@ -2,8 +2,6 @@
 
 import { api } from '@/convex/_generated/api';
 import { Preloaded, usePreloadedQuery } from 'convex/react';
-import { MapPin } from 'lucide-react';
-import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import Link from 'next/link';
 
@@ -25,7 +23,11 @@ export function NewCities({
               className=" border rounded-md p-2 flex items-center gap-4 text-sm hover:bg-gray-100 transition-all duration-200 ease-in-out"
             >
               <div className="flex items-center">
-                <img src={city.flag} className="w-6 h-6 rounded-full" />
+                <img
+                  src={city.flag}
+                  alt={city.city}
+                  className="w-6 h-6 rounded-full"
+                />
               </div>
               <div className="flex flex-col">
                 <p className="font-semibold">{city.city},</p>

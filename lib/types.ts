@@ -1,5 +1,4 @@
 import { Id } from '@/convex/_generated/dataModel';
-import { RegisteredQuery } from 'convex/server';
 
 export type UserType = {
   _id: Id<'users'>;

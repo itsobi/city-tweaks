@@ -10,7 +10,6 @@ import { Notifications } from './notifications';
 import { preloadQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { auth } from '@clerk/nextjs/server';
-import { ComboboxDemo } from './test';
 
 export async function Header() {
   const { userId } = await auth();
@@ -30,7 +29,6 @@ export async function Header() {
 
       <div className="w-[300px] xl:w-[400px]">
         <HeaderSearch preloadedCities={preloadedCities} />
-        {/* <ComboboxDemo /> */}
       </div>
 
       <div className="flex items-center gap-1.5">

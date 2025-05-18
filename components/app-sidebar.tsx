@@ -23,19 +23,12 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import logo from '@/public/logo.png';
-import {
-  SignedOut,
-  SignInButton,
-  SignOutButton,
-  UserButton,
-  useUser,
-} from '@clerk/nextjs';
+import { SignedOut, SignInButton, SignOutButton, useUser } from '@clerk/nextjs';
 import { SignedIn } from '@clerk/nextjs';
 import { Button } from './ui/button';
 import Link from 'next/link';
 import { CreateCityTweakButton } from './create-city-tweak-button';
 import { usePathname } from 'next/navigation';
-import { useCityTweakStore } from '@/lib/store';
 
 export function AppSidebar() {
   const { user } = useUser();

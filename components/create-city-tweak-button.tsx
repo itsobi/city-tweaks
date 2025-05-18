@@ -32,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select';
-import { top25Cities } from '@/lib/top25Cities';
 import { Textarea } from './ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useCallback, useState, useTransition } from 'react';
@@ -48,7 +47,7 @@ import { api } from '@/convex/_generated/api';
 import { toast } from 'sonner';
 import { Id } from '@/convex/_generated/dataModel';
 import { SidebarMenuButton } from './ui/sidebar';
-import { Cities, GroupedCities } from '@/lib/types';
+import { GroupedCities } from '@/lib/types';
 
 function ImageDropzone({
   onChange,
@@ -70,7 +69,7 @@ function ImageDropzone({
         onChange(acceptedFile[0]);
       }
     },
-    [onChange]
+    [onChange, setFile]
   );
   const { getRootProps, getInputProps, isDragActive, fileRejections } =
     useDropzone({
@@ -351,7 +350,7 @@ function CreatePostForm({
           <FormField
             control={form.control}
             name="image"
-            render={({ field: { onChange, value } }) => {
+            render={({ field: { onChange } }) => {
               return (
                 <FormItem>
                   <FormLabel>Image</FormLabel>

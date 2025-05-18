@@ -3,7 +3,6 @@
 import { api } from '@/convex/_generated/api';
 import { Preloaded, usePreloadedQuery } from 'convex/react';
 import { ScrollArea } from '../ui/scroll-area';
-import { Dot, UserRoundPen } from 'lucide-react';
 import Link from 'next/link';
 
 export function PopularCities({
