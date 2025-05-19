@@ -50,20 +50,20 @@ export async function POST(req: Request) {
   try {
     switch (eventType) {
       case 'user.created':
-        console.log('USER CREATED');
         await client.mutation(api.users.createUser, {
           clerkId: event.data.id,
           username: event.data.username!,
           imageUrl: event.data.image_url,
         });
+        console.log('USER CREATED');
         break;
       case 'user.updated':
-        console.log('USER UPDATED');
         await client.mutation(api.users.updateUser, {
           clerkId: event.data.id,
           username: event.data.username ?? undefined,
           imageUrl: event.data.image_url,
         });
+        console.log('USER UPDATED');
         break;
       default:
         console.log('Unhandled event type: ', eventType);
