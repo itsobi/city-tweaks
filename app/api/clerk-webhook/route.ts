@@ -5,7 +5,10 @@ import { Webhook } from 'svix';
 import { headers } from 'next/headers';
 
 export async function POST(req: Request) {
-  const SIGNING_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
+  const SIGNING_SECRET =
+    process.env.NODE_ENV === 'production'
+      ? process.env.CLERK_WEBHOOK_SIGNING_SECRET_PROD
+      : process.env.CLERK_WEBHOOK_SIGNING_SECRET;
 
   if (!SIGNING_SECRET) {
     throw new Error('CLERK_SIGNING_SECRET is not set');
