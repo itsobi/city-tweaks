@@ -1,44 +1,30 @@
-import { api } from '@/convex/_generated/api';
+'use client';
+
 import { NewCities } from './rightMenu/new-cities';
 import { PopularCities } from './rightMenu/popular-cities';
+import { cn } from '@/lib/utils';
+import { useUser } from '@clerk/nextjs';
+import { usePathname } from 'next/navigation';
 
-import { preloadQuery } from 'convex/nextjs';
-import { Button } from './ui/button';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
-import { CreateCityTweakButton } from './create-city-tweak-button';
-import { auth } from '@clerk/nextjs/server';
+export function RightMenu() {
+  const { user } = useUser();
+  const pathname = usePathname();
 
-export async function RightMenu() {
-  const { userId } = await auth();
-  const preloadedNewCities = await preloadQuery(api.cities.getNewCities);
-  const preloadedPopularCities = await preloadQuery(
-    api.cities.getPopularCities
-  );
+  const isManageAccountPage = pathname === '/manage-account';
+
+  if (!user) return null;
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <p className="font-semibold text-muted-foreground">
-            🔥 Popular City Tweaks
-          </p>
-          {userId && <CreateCityTweakButton plusIcon />}
-        </div>
-        <PopularCities preloadedPopularCities={preloadedPopularCities} />
-      </div>
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <p className="font-semibold text-muted-foreground">🆕 New Cities</p>
-          {userId && (
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/add-city">
-                <Plus className="w-4 h-4" />
-              </Link>
-            </Button>
-          )}
-        </div>
-        <NewCities preloadedNewCities={preloadedNewCities} />
+    <div
+      className={cn(
+        'hidden xl:block w-1/3 border-l border-l-yellow-500 p-4 sticky top-[64px] h-[calc(100vh-64px)]',
+        isManageAccountPage && 'xl:hidden'
+      )}
+    >
+      <div className="flex flex-col gap-8">
+        <PopularCities userId={user.id} />
+
+        <NewCities userId={user.id} />
       </div>
     </div>
   );

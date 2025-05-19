@@ -30,9 +30,7 @@ export default function RootLayout({
                 <div className="flex">
                   <div className="flex flex-1">
                     <div className="overflow-auto w-full">{children}</div>
-                    <div className="hidden xl:block w-1/3 border-l border-l-yellow-500 p-4 sticky top-[64px] h-[calc(100vh-64px)]">
-                      <RightMenu />
-                    </div>
+                    <RightMenu />
                   </div>
                 </div>
               </main>

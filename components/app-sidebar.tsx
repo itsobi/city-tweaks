@@ -29,10 +29,11 @@ import { Button } from './ui/button';
 import Link from 'next/link';
 import { CreateCityTweakButton } from './create-city-tweak-button';
 import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
 
 export function AppSidebar() {
   const { user } = useUser();
-  const { isMobile, toggleSidebar } = useSidebar();
+  const { isMobile, toggleSidebar, open } = useSidebar();
   const pathname = usePathname();
 
   return (
