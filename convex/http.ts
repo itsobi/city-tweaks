@@ -25,13 +25,10 @@ http.route({
       return new Response('Missing Svix headers', { status: 400 });
     }
 
-    const WEBHOOK_SECRET =
-      process.env.NODE_ENV === 'development'
-        ? process.env.CLERK_WEBHOOK_SIGNING_SECRET_DEV
-        : process.env.CLERK_WEBHOOK_SIGNING_SECRET_PROD;
+    const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET;
 
     if (!WEBHOOK_SECRET) {
-      throw new Error('CLERK_WEBHOOK_SECRET is not set');
+      throw new Error('WEBHOOK_SECRET is not set');
     }
 
     const wh = new Webhook(WEBHOOK_SECRET);
@@ -43,8 +40,6 @@ http.route({
       console.error('Invalid webhook');
       return new Response('Invalid webhook', { status: 400 });
     }
-
-    console.log('EVENT>>', event);
 
     try {
       switch (event.type) {

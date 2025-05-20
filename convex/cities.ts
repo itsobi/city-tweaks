@@ -10,7 +10,7 @@ export const cityExists = query({
     const city = await ctx.db
       .query('cities')
       .filter((q) =>
-        q.and(
+        q.or(
           q.eq(q.field('city'), args.city),
           q.eq(q.field('region'), args.region)
         )

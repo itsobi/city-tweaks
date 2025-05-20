@@ -26,8 +26,10 @@ export async function checkCity({
       };
     }
 
-    const trimmedCity = city.trim();
-    const trimmedRegion = region.trim();
+    const trimmedCity =
+      city.trim().charAt(0).toUpperCase() + city.trim().slice(1);
+    const trimmedRegion =
+      region.trim().charAt(0).toUpperCase() + region.trim().slice(1);
 
     const cityExists = await convexClient.query(api.cities.cityExists, {
       city: trimmedCity,
