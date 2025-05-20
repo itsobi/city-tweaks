@@ -26,9 +26,9 @@ http.route({
     }
 
     const WEBHOOK_SECRET =
-      process.env.NODE_ENV === 'production'
-        ? process.env.CLERK_WEBHOOK_SIGNING_SECRET_PROD
-        : process.env.CLERK_WEBHOOK_SIGNING_SECRET_DEV;
+      process.env.NODE_ENV === 'development'
+        ? process.env.CLERK_WEBHOOK_SIGNING_SECRET_DEV
+        : process.env.CLERK_WEBHOOK_SIGNING_SECRET_PROD;
 
     if (!WEBHOOK_SECRET) {
       throw new Error('CLERK_WEBHOOK_SECRET is not set');
