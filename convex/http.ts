@@ -25,8 +25,6 @@ http.route({
       return new Response('Missing Svix headers', { status: 400 });
     }
 
-    // TODO: Add CLERK_WEBHOOK_SIGNING_SECRET_PROD env to convex
-
     const WEBHOOK_SECRET =
       process.env.NODE_ENV === 'production'
         ? process.env.CLERK_WEBHOOK_SIGNING_SECRET_PROD
