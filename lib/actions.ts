@@ -1,8 +1,8 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { client } from './convexHTTPClient';
 import { api } from '@/convex/_generated/api';
+import { convexClient } from './convexClient';
 
 const ENDPOINT =
   process.env.NODE_ENV === 'development'
@@ -29,7 +29,7 @@ export async function checkCity({
     const trimmedCity = city.trim();
     const trimmedRegion = region.trim();
 
-    const cityExists = await client.query(api.cities.cityExists, {
+    const cityExists = await convexClient.query(api.cities.cityExists, {
       city: trimmedCity,
       region: trimmedRegion,
     });
