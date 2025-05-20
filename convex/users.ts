@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { internalMutation, query } from './_generated/server';
 import { api } from './_generated/api';
 
 export const userExists = query({
@@ -16,28 +16,31 @@ export const userExists = query({
   },
 });
 
-export const createUser = mutation({
+export const createUser = internalMutation({
   args: {
     clerkId: v.string(),
     username: v.string(),
     imageUrl: v.string(),
   },
   handler: async (ctx, args) => {
+    console.log('---INSIDE CREATE USER---');
     const userExists = await ctx.runQuery(api.users.userExists, {
       clerkId: args.clerkId,
     });
 
-    if (!userExists) return;
+    if (userExists) return;
 
-    await ctx.db.insert('users', {
+    const user = await ctx.db.insert('users', {
       clerkId: args.clerkId,
       username: args.username,
       imageUrl: args.imageUrl,
     });
+
+    console.log('CREATED USER>>', user);
   },
 });
 
-export const updateUser = mutation({
+export const updateUser = internalMutation({
   args: {
     clerkId: v.string(),
     username: v.optional(v.string()),
@@ -46,9 +49,13 @@ export const updateUser = mutation({
   handler: async (ctx, args) => {
     const updateFields: any = {};
 
-    if (args.username !== undefined || null)
+    if (args.username !== undefined || null) {
       updateFields.username = args.username;
-    if (args.imageUrl !== undefined) updateFields.imageUrl = args.imageUrl;
+    }
+
+    if (args.imageUrl !== undefined) {
+      updateFields.imageUrl = args.imageUrl;
+    }
 
     const user = await ctx.db
       .query('users')
