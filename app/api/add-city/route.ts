@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       - isValid: true if the city and region are valid after correcting the spelling if they were misspelled, false otherwise
       - city: the city name capitalized
       - region: the region name capitalized
-      - flag: if the city is outside of the United States, the flag will be the country's flag. Go to Wikipedia to find the country's flag and use the image address. Make sure to make the flag URL a valid image URL. If the city is in the United States, the flag will be this: https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_United_States_%28DoS_ECA_Color_Standard%29.svg/250px-Flag_of_the_United_States_%28DoS_ECA_Color_Standard%29.svg.png
+      - flag: if the city is outside of the United States, the flag will be the country's flag. Go to Wikipedia to find the country's flag and use the image address. For example if the country is Canada, search the flag of Canada and use the image address. Make sure the image address is a valid. If the city is in the United States, the flag will be this: https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Flag_of_the_United_States_%28DoS_ECA_Color_Standard%29.svg/250px-Flag_of_the_United_States_%28DoS_ECA_Color_Standard%29.svg.png
       `,
     });
 
